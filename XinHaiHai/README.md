@@ -6,23 +6,38 @@
 
 ---
 
+## 下载（请读这一段）
+
+仓库本体**没有** `心海海.exe`（单文件约 154MB，超过 GitHub 普通文件 100MB 上限）。
+
+想直接玩，请到 **[Releases / v1.5.0](https://github.com/Xinhaihai-Xinhaihai/Table_pet_xinhaihai/releases/tag/v1.5.0)** 下载完整安装包：
+
+| 你点哪个 | 里面有什么 | 能不能直接玩 |
+|----------|------------|--------------|
+| **`Table_pet_xinhaihai_v1.5.0.zip`**（推荐） | `心海海.exe` + `skin` + `live2d` + `gif` + 源码 + README | **能**。解压后双击 exe |
+| `Source code (zip/tar.gz)` | 只有源码和素材，**没有 exe** | 不能。需要自己用 .NET 9 编译 |
+
+> GitHub Release 页面底下自动出现的 Source code，是打 tag 时的仓库快照，**不会**把 Release 附件里的 exe 打进去。
+
 ## 一键运行
 
-把 **`心海海.exe`** 放在和 `skin`、`live2d`、`gif`、`XinHaiHai` **同一层目录**,双击即可启动(自包含单文件,无需装 .NET)。她会从屏幕右下角登场。
+解压完整包后目录应是：
 
 ```
-某文件夹\
-  心海海.exe     ← 启动器,双击运行
+Table_pet_xinhaihai_v1.5.0\
+  心海海.exe     ← 启动器,双击运行（自包含,无需装 .NET）
+  README.md
   skin\          ← PNG 自定义皮肤
   live2d\        ← Live2D 模型
   gif\           ← GIF 动画皮肤
-  XinHaiHai\     ← 源码(可选)
+  XinHaiHai\     ← 源码(可选,不删不影响运行)
 ```
+
+`心海海.exe` 必须和 `skin` / `live2d` / `gif` **同一层**。双击即可,她会从屏幕右下角登场。
 
 - 托盘有「心海海」图标:双击隐藏/唤出,右键退出。随时可退,随时可关。
 - 数据目录:`%APPDATA%\心海海\`(配置、状态、日志、任务库、每日计划)。
 
-目录应长这样(`心海海.exe` 和 `skin` / `live2d` / `gif` / `XinHaiHai` 同级)
 ---
 
 ## 功能总览
