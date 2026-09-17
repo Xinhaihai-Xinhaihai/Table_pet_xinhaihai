@@ -236,9 +236,13 @@ dotnet publish -c Release -r win-x64 --self-contained true `
 
 - GitHub:[Xinhaihai-Xinhaihai](https://github.com/Xinhaihai-Xinhaihai)
 - 也可以给仓库点个 Star,提 Issue / PR 都是很大的鼓励
-- 赞赏码:把你的收款码放到 `docs/sponsor.png`(或 `docs/sponsor.jpg`)后,这里就能直接显示
 
-![赞赏][alt text](7c1500e3b8f4add57cafbd5d1dfb485f_720.jpg)
-![alt text](5a185e8d1db69a24c563e28c7a922c9c.jpg)
+微信 / 支付宝均可扫码:
+
+<p>
+<img src="XinHaiHai/docs/wechat.jpg" alt="微信支付" width="280">
+<img src="XinHaiHai/docs/alipay.jpg" alt="支付宝" width="280">
+</p>
 
 祝你和心海海玩得开心~ 🌊
+
