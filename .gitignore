@@ -1,0 +1,19 @@
+# build
+XinHaiHai/bin/
+XinHaiHai/obj/
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.cache
+
+# local/runtime
+**/log.txt
+**/state.json
+**/config.json
+webview2/
+
+# 154MB self-contained exe, published via GitHub Release
+心海海.exe
+*.exe

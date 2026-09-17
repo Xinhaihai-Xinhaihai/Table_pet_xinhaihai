@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyName>心海海</AssemblyName>
+    <RootNamespace>XinHaiHai</RootNamespace>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyTitle>心海海</AssemblyTitle>
+    <Product>心海海</Product>
+    <Company>心海海</Company>
+    <Copyright>心海海桌宠</Copyright>
+    <Version>1.5.0</Version>
+    <SatelliteResourceLanguages>zh-Hans</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4078.44" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="data\**\*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <!-- 同时嵌入 exe:单文件拷走也能在首次运行时自动释放 data\lines_*.json -->
+    <EmbeddedResource Include="data\lines_official.json" />
+    <EmbeddedResource Include="data\lines_custom.json" />
+    <EmbeddedResource Include="data\lines_live2d.json" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,237 @@
+﻿<Window x:Class="XinHaiHai.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="心海海" Width="270" Height="410"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        Topmost="True" ShowInTaskbar="False" ShowActivated="False"
+        ResizeMode="NoResize" Focusable="False">
+
+    <Window.Resources>
+        <LinearGradientBrush x:Key="HairBackBrush" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#74D6C3" Offset="0"/>
+            <GradientStop Color="#3EA492" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="HairFrontBrush" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#93E8D6" Offset="0"/>
+            <GradientStop Color="#56BBA9" Offset="1"/>
+        </LinearGradientBrush>
+        <RadialGradientBrush x:Key="EyeBrush" GradientOrigin="0.5,0.3" Center="0.5,0.45" RadiusX="0.62" RadiusY="0.62">
+            <GradientStop Color="#FF9598" Offset="0"/>
+            <GradientStop Color="#E04A56" Offset="0.55"/>
+            <GradientStop Color="#8E1F2C" Offset="1"/>
+        </RadialGradientBrush>
+        <LinearGradientBrush x:Key="SkirtBrush" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#E25460" Offset="0"/>
+            <GradientStop Color="#B93844" Offset="1"/>
+        </LinearGradientBrush>
+        <SolidColorBrush x:Key="SkinBrush" Color="#FFEFE2"/>
+        <SolidColorBrush x:Key="SkinEdge" Color="#EBBC9E"/>
+        <SolidColorBrush x:Key="HairEdge" Color="#37907F"/>
+        <SolidColorBrush x:Key="RibbonBrush" Color="#E5484D"/>
+        <SolidColorBrush x:Key="RibbonEdge" Color="#A72E38"/>
+        <SolidColorBrush x:Key="LineBrush" Color="#4A2630"/>
+    </Window.Resources>
+
+    <Grid VerticalAlignment="Bottom">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="110"/>
+            <RowDefinition Height="26"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 撒娇气泡 -->
+        <Grid x:Name="BubbleRoot" Grid.Row="0" Opacity="0" IsHitTestVisible="False"
+              HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,4">
+            <StackPanel>
+                <Border Background="#F8FFFFFF" CornerRadius="12" Padding="12,8" MaxWidth="250"
+                        BorderBrush="#FFB7C5" BorderThickness="2">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.28"/>
+                    </Border.Effect>
+                    <TextBlock x:Name="BubbleText" TextWrapping="Wrap" FontFamily="Microsoft YaHei UI"
+                               FontSize="13" Foreground="#4A3238" LineHeight="19" Text=""/>
+                </Border>
+                <Polygon Points="0,0 16,0 8,10" Fill="#F8FFFFFF" HorizontalAlignment="Center" Margin="0,-1,0,0"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- 无聊值(公开可见;暂停时交替显示恢复倒计时) -->
+        <Border Grid.Row="1" Width="200" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"
+                Background="#C0272030" CornerRadius="10">
+            <Grid>
+                <Rectangle x:Name="BoredomFill" HorizontalAlignment="Left" Margin="3,3,3,3"
+                           Width="150" RadiusX="7" RadiusY="7" Fill="#7CCB7F"/>
+                <TextBlock x:Name="BoredomText" Text="无聊值 85" Foreground="White" FontSize="11"
+                           FontFamily="Microsoft YaHei UI" FontWeight="Bold"
+                           HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock.Effect>
+                        <DropShadowEffect BlurRadius="2" ShadowDepth="1" Opacity="0.8"/>
+                    </TextBlock.Effect>
+                </TextBlock>
+            </Grid>
+        </Border>
+
+        <!-- 桌宠本体 -->
+        <Grid x:Name="PetRoot" Grid.Row="2" Width="220" Height="272" HorizontalAlignment="Center" Cursor="Hand">
+            <Grid.RenderTransform>
+                <TransformGroup>
+                    <TranslateTransform x:Name="BobT"/>
+                    <TranslateTransform x:Name="JumpT"/>
+                </TransformGroup>
+            </Grid.RenderTransform>
+
+            <Canvas x:Name="VectorPet" Width="220" Height="272">
+
+                <!-- 地面影子 -->
+                <Ellipse Canvas.Left="64" Canvas.Top="254" Width="92" Height="14" Fill="#26000000"/>
+
+                <!-- 后发(及腰长发) -->
+                <Path x:Name="HairBack" Fill="{StaticResource HairBackBrush}" Stroke="{StaticResource HairEdge}" StrokeThickness="2"
+                      Data="M 110,28 C 54,28 30,70 32,110 C 33,146 26,184 38,220 C 45,240 58,252 68,257 C 72,242 70,222 72,204 C 77,224 83,242 94,256 L 126,256 C 137,242 143,224 148,204 C 150,222 148,242 152,257 C 162,252 175,240 182,220 C 194,184 187,146 188,110 C 190,70 166,28 110,28 Z">
+                    <Path.RenderTransform>
+                        <RotateTransform x:Name="HairSway" CenterX="110" CenterY="40"/>
+                    </Path.RenderTransform>
+                </Path>
+
+                <!-- 呆毛 -->
+                <Path Fill="{StaticResource HairFrontBrush}" Stroke="{StaticResource HairEdge}" StrokeThickness="1.5"
+                      Data="M 110,42 C 102,24 114,12 130,17 C 117,20 111,29 113,42 Z"/>
+
+                <!-- 脖子 -->
+                <Rectangle Canvas.Left="103" Canvas.Top="142" Width="14" Height="22" Fill="{StaticResource SkinBrush}"/>
+
+                <!-- 左袖 -->
+                <Path Fill="White" Stroke="#D8C3CB" StrokeThickness="1.5"
+                      Data="M 90,166 C 70,172 60,188 62,202 C 72,208 84,204 91,197 Z"/>
+                <Ellipse Canvas.Left="57" Canvas.Top="193" Width="13" Height="13" Fill="{StaticResource SkinBrush}"
+                         Stroke="{StaticResource SkinEdge}" StrokeThickness="1"/>
+
+                <!-- 右袖(会挥手) -->
+                <Canvas x:Name="RightArm">
+                    <Canvas.RenderTransform>
+                        <RotateTransform x:Name="RightArmRotate" CenterX="130" CenterY="170"/>
+                    </Canvas.RenderTransform>
+                    <Path Fill="White" Stroke="#D8C3CB" StrokeThickness="1.5"
+                          Data="M 130,166 C 150,172 160,188 158,202 C 148,208 136,204 129,197 Z"/>
+                    <Ellipse Canvas.Left="150" Canvas.Top="193" Width="13" Height="13" Fill="{StaticResource SkinBrush}"
+                             Stroke="{StaticResource SkinEdge}" StrokeThickness="1"/>
+                </Canvas>
+
+                <!-- 上衣(白色和风短衫 + 红色衣领) -->
+                <Path Fill="White" Stroke="#D8C3CB" StrokeThickness="1.5"
+                      Data="M 88,158 C 83,176 83,190 88,202 L 132,202 C 137,190 137,176 132,158 C 120,168 100,168 88,158 Z"/>
+                <Path Stroke="{StaticResource RibbonBrush}" StrokeThickness="4" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                      Data="M 100,161 L 110,180 L 120,161"/>
+
+                <!-- 红裙 -->
+                <Path Fill="{StaticResource SkirtBrush}" Stroke="#A83240" StrokeThickness="1.5"
+                      Data="M 84,200 C 75,222 75,235 81,241 L 139,241 C 145,235 145,222 136,200 Z"/>
+                <Path Stroke="#A83240" StrokeThickness="1"
+                      Data="M 97,204 L 93,239 M 110,204 L 110,241 M 123,204 L 127,239"/>
+
+                <!-- 腿与鞋 -->
+                <Rectangle Canvas.Left="97" Canvas.Top="240" Width="9" Height="12" Fill="{StaticResource SkinBrush}"/>
+                <Rectangle Canvas.Left="114" Canvas.Top="240" Width="9" Height="12" Fill="{StaticResource SkinBrush}"/>
+                <Ellipse Canvas.Left="91" Canvas.Top="248" Width="20" Height="11" Fill="#8C2F3A"/>
+                <Ellipse Canvas.Left="109" Canvas.Top="248" Width="20" Height="11" Fill="#8C2F3A"/>
+
+                <!-- 脸 -->
+                <Ellipse Canvas.Left="56" Canvas.Top="50" Width="108" Height="100"
+                         Fill="{StaticResource SkinBrush}" Stroke="{StaticResource SkinEdge}" StrokeThickness="1.5"/>
+
+                <!-- 腮红 -->
+                <Ellipse x:Name="BlushL" Canvas.Left="63" Canvas.Top="119" Width="23" Height="11" Fill="#FFA9B4" Opacity="0.55"/>
+                <Ellipse x:Name="BlushR" Canvas.Left="134" Canvas.Top="119" Width="23" Height="11" Fill="#FFA9B4" Opacity="0.55"/>
+
+                <!-- 眉毛 -->
+                <Canvas x:Name="BrowsNormal">
+                    <Path Stroke="#2F7D6E" StrokeThickness="2.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Data="M 76,86 Q 86,81 96,86"/>
+                    <Path Stroke="#2F7D6E" StrokeThickness="2.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Data="M 124,86 Q 134,81 144,86"/>
+                </Canvas>
+                <Canvas x:Name="BrowsAngry" Visibility="Collapsed">
+                    <Path Stroke="#2F7D6E" StrokeThickness="2.8" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Data="M 76,82 L 96,90"/>
+                    <Path Stroke="#2F7D6E" StrokeThickness="2.8" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Data="M 144,82 L 124,90"/>
+                </Canvas>
+
+                <!-- 睁眼(红瞳) -->
+                <Canvas x:Name="EyesOpen">
+                    <Ellipse Canvas.Left="76" Canvas.Top="95" Width="20" Height="26" Fill="{StaticResource EyeBrush}" Stroke="#6E1822" StrokeThickness="1.4"/>
+                    <Ellipse Canvas.Left="82" Canvas.Top="102" Width="8" Height="12" Fill="#55121A" Opacity="0.85"/>
+                    <Ellipse Canvas.Left="78" Canvas.Top="98" Width="7" Height="8" Fill="White" Opacity="0.95"/>
+                    <Ellipse Canvas.Left="88" Canvas.Top="112" Width="4" Height="4.5" Fill="White" Opacity="0.8"/>
+                    <Path Stroke="{StaticResource LineBrush}" StrokeThickness="3.4" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Data="M 73,98 Q 86,88 99,98"/>
+                    <Ellipse Canvas.Left="124" Canvas.Top="95" Width="20" Height="26" Fill="{StaticResource EyeBrush}" Stroke="#6E1822" StrokeThickness="1.4"/>
+                    <Ellipse Canvas.Left="130" Canvas.Top="102" Width="8" Height="12" Fill="#55121A" Opacity="0.85"/>
+                    <Ellipse Canvas.Left="126" Canvas.Top="98" Width="7" Height="8" Fill="White" Opacity="0.95"/>
+                    <Ellipse Canvas.Left="136" Canvas.Top="112" Width="4" Height="4.5" Fill="White" Opacity="0.8"/>
+                    <Path Stroke="{StaticResource LineBrush}" StrokeThickness="3.4" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Data="M 121,98 Q 134,88 147,98"/>
+                </Canvas>
+
+                <!-- 闭眼(开心/睡觉) -->
+                <Canvas x:Name="EyesClosed" Visibility="Collapsed">
+                    <Path Stroke="{StaticResource LineBrush}" StrokeThickness="3" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Data="M 76,106 Q 86,114 96,106"/>
+                    <Path Stroke="{StaticResource LineBrush}" StrokeThickness="3" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Data="M 124,106 Q 134,114 144,106"/>
+                </Canvas>
+
+                <!-- 嘴(多形态切换) -->
+                <Path x:Name="MouthSmile" Stroke="#C25B66" StrokeThickness="2.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                      Data="M 102,133 Q 110,140 118,133"/>
+                <Path x:Name="MouthOpen" Visibility="Collapsed" Fill="#E86A76" Stroke="#B03A48" StrokeThickness="1.5"
+                      Data="M 100,131 Q 110,146 120,131 Q 110,136 100,131 Z"/>
+                <Path x:Name="MouthPout" Visibility="Collapsed" Stroke="#C25B66" StrokeThickness="2.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                      Data="M 103,137 Q 110,132 117,137"/>
+                <Path x:Name="MouthAngry" Visibility="Collapsed" Fill="#B03A48"
+                      Data="M 101,139 Q 110,129 119,139 Q 110,135 101,139 Z"/>
+
+                <!-- 刘海 -->
+                <Path Fill="{StaticResource HairFrontBrush}" Stroke="{StaticResource HairEdge}" StrokeThickness="1.8"
+                      Data="M 110,44 C 70,44 52,66 54,94 C 62,80 68,84 74,98 C 80,78 90,84 94,100 C 100,80 120,80 126,100 C 130,84 140,78 146,98 C 152,84 158,80 166,94 C 168,66 150,44 110,44 Z"/>
+
+                <!-- 两侧长鬓发 -->
+                <Path Fill="{StaticResource HairFrontBrush}" Stroke="{StaticResource HairEdge}" StrokeThickness="1.5"
+                      Data="M 57,86 C 50,120 55,160 46,198 C 57,192 63,178 65,158 C 67,132 63,106 61,90 Z"/>
+                <Path Fill="{StaticResource HairFrontBrush}" Stroke="{StaticResource HairEdge}" StrokeThickness="1.5"
+                      Data="M 163,86 C 170,120 165,160 174,198 C 163,192 157,178 155,158 C 153,132 157,106 159,90 Z"/>
+
+                <!-- 红色蝴蝶结发饰 -->
+                <Path Fill="{StaticResource RibbonBrush}" Stroke="{StaticResource RibbonEdge}" StrokeThickness="1.5"
+                      Data="M 144,50 C 130,35 112,40 117,52 C 121,62 136,60 144,50 Z"/>
+                <Path Fill="{StaticResource RibbonBrush}" Stroke="{StaticResource RibbonEdge}" StrokeThickness="1.5"
+                      Data="M 144,50 C 158,35 176,40 171,52 C 167,62 152,60 144,50 Z"/>
+                <Ellipse Canvas.Left="137" Canvas.Top="43" Width="14" Height="14"
+                         Fill="{StaticResource RibbonBrush}" Stroke="{StaticResource RibbonEdge}" StrokeThickness="1.5"/>
+
+                <!-- 表情挂件 -->
+                <TextBlock x:Name="ZzzMark" Canvas.Left="34" Canvas.Top="38" Text="Z z z" FontFamily="Comic Sans MS"
+                           FontSize="16" FontWeight="Bold" Foreground="#7FA8FF" Visibility="Collapsed">
+                    <TextBlock.RenderTransform>
+                        <RotateTransform Angle="-14"/>
+                    </TextBlock.RenderTransform>
+                </TextBlock>
+
+                <!-- 怒气爆筋(矢量) -->
+                <Canvas x:Name="AngryMark" Visibility="Collapsed">
+                    <Path Stroke="#E5484D" StrokeThickness="3.4" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                          Data="M 49,57 L 42,50 M 59,57 L 66,50 M 49,66 L 42,73 M 59,66 L 66,73"/>
+                </Canvas>
+
+                <!-- 音符(矢量) -->
+                <Canvas x:Name="NotesMark" Visibility="Collapsed">
+                    <Ellipse Canvas.Left="170" Canvas.Top="86" Width="9" Height="7" Fill="#E86A9E"/>
+                    <Rectangle Canvas.Left="177" Canvas.Top="68" Width="2.6" Height="21" Fill="#E86A9E"/>
+                    <Path Fill="#E86A9E" Data="M 177,68 C 185,70 186,77 181,81 C 185,76 182,73 177,73 Z"/>
+                    <Ellipse Canvas.Left="188" Canvas.Top="74" Width="8" Height="6" Fill="#F08CB4"/>
+                    <Rectangle Canvas.Left="194" Canvas.Top="58" Width="2.4" Height="19" Fill="#F08CB4"/>
+                    <Path Fill="#F08CB4" Data="M 194,58 C 201,60 202,66 198,70 C 201,65 198,63 194,63 Z"/>
+                </Canvas>
+
+                <!-- 汗滴(矢量) -->
+                <Path x:Name="SweatMark" Visibility="Collapsed" Fill="#8CC4EE" Stroke="#5A9BD0" StrokeThickness="1.5"
+                      Data="M 50,52 C 44,62 42,69 46,74 C 50,79 58,77 59,70 C 60,64 55,59 50,52 Z"/>
+            </Canvas>
+
+            <!-- 自定义皮肤(skin/idle.png 存在时启用) -->
+            <Image x:Name="SkinImage" Width="220" Height="272" Visibility="Collapsed" Stretch="Uniform"/>
+        </Grid>
+    </Grid>
+</Window>
