@@ -1,5 +1,7 @@
 # 心海海 · 桌宠 🌊
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../LICENSE)
+
 一只有情绪、要吃喝、有作息、会打工赚钱、会满屏溜达的 Windows 桌面宠物。形象为 Q 版矢量卡通(青绿长发 + 红瞳 + 红蝴蝶结,和风巫女短衫红裙),灵感致敬《千恋＊万花》丛雨。
 
 > 说明:原游戏立绘为 Yuzusoft 版权素材,本程序**未使用任何官方图片**,而是用矢量图重新绘制。想 100% 还原,见「换成自己的立绘」。
@@ -240,9 +242,15 @@ dotnet publish -c Release -r win-x64 --self-contained true `
 微信 / 支付宝均可扫码:
 
 <p>
-<img src="docs/wechat.jpg" alt="微信支付" width="280">
-<img src="docs/alipay.jpg" alt="支付宝" width="280">
+<img src="docs/sponsor.png" alt="微信支付" width="280">
+<img src="docs/sponsor.jpg" alt="支付宝" width="280">
 </p>
+
+## 开源协议
+
+本项目以 [MIT License](../LICENSE) 开源。
+
+第三方素材请遵守原作者条款:`skin` / `live2d` / `gif` 为示例或用户自备资源,官方游戏立绘版权归原权利人所有,本程序未使用官方图片。
 
 祝你和心海海玩得开心~ 🌊
 
