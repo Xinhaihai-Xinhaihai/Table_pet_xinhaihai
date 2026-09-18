@@ -12,14 +12,17 @@
 
 仓库本体**没有** `心海海.exe`（单文件约 154MB，超过 GitHub 普通文件 100MB 上限）。
 
-想直接玩，请到 **[Releases / v1.5.0](https://github.com/Xinhaihai-Xinhaihai/Table_pet_xinhaihai/releases/tag/v1.5.0)** 下载完整安装包：
+想直接玩，请到 **[Releases / v1.5.0](https://github.com/Xinhaihai-Xinhaihai/Table_pet_xinhaihai/releases/tag/v1.5.0)** 下载：
 
 | 你点哪个 | 里面有什么 | 能不能直接玩 |
 |----------|------------|--------------|
-| **`Table_pet_xinhaihai_v1.5.0.zip`**（推荐） | `心海海.exe` + `skin` + `live2d` + `gif` + 源码 + README | **能**。解压后双击 exe |
-| `Source code (zip/tar.gz)` | 只有源码和素材，**没有 exe** | 不能。需要自己用 .NET 9 编译 |
+| **`Table_pet_xinhaihai_v1.5.0.zip`**（Windows 推荐） | `心海海.exe` + `skin` + `live2d` + `gif` + 源码 + README | **能**。解压后双击 exe |
+| **`xinhaihai-android-v1.0.0.apk`**（安卓） | 手机桌宠安装包 | **能**。允许未知来源后安装，首次请开悬浮窗权限 |
+| `Source code (zip/tar.gz)` | 只有源码和素材，**没有 exe / apk** | 不能。需要自己编译 |
 
-> GitHub Release 页面底下自动出现的 Source code，是打 tag 时的仓库快照，**不会**把 Release 附件里的 exe 打进去。
+> 已经有安卓版 1.0。商店、养成、长按菜单对齐电脑端；Live2D 暂未移植（电脑专用）。
+>
+> GitHub Release 页面底下自动出现的 Source code，是打 tag 时的仓库快照，**不会**把 Release 附件里的 exe / apk 打进去。
 
 ## 一键运行
 
@@ -39,6 +42,15 @@ Table_pet_xinhaihai_v1.5.0\
 
 - 托盘有「心海海」图标:双击隐藏/唤出,右键退出。随时可退,随时可关。
 - 数据目录:`%APPDATA%\心海海\`(配置、状态、日志、任务库、每日计划)。
+
+## 安卓版
+
+手机也能养她。到同一页 Releases 下 **`xinhaihai-android-v1.0.0.apk`**，允许未知来源后安装。
+
+- 首次打开请给**悬浮窗**权限，她才会浮在桌面上。
+- 长按她：摸摸头 / 逗她玩 / 聊天、商店、投喂、状态、今日计划、外观、改名、听歌、睡觉等，和电脑端菜单对齐。
+- 快乐值条叠在绿条正中；无聊见底会调皮晃动。
+- Live2D 仍是电脑专用，安卓暂未移植。
 
 ---
 
@@ -242,8 +254,8 @@ dotnet publish -c Release -r win-x64 --self-contained true `
 微信 / 支付宝均可扫码:
 
 <p>
-<img src="docs/sponsor.png" alt="微信支付" width="280">
-<img src="docs/sponsor.jpg" alt="支付宝" width="280">
+<img src="XinHaiHai/docs/sponsor.png" alt="微信支付" width="280">
+<img src="XinHaiHai/docs/sponsor.jpg" alt="支付宝" width="280">
 </p>
 
 ## 开源协议
