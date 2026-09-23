@@ -31,6 +31,8 @@ public partial class MainWindow : Window
     MenuItem miHead, miPat, miPlay, miChat, miShop, miStatus, miFood, miDrink, miPlan, miReplan, miHide, miDir, miExit;
     MenuItem miLook, miLookOfficial, miLookCustom, miLookGif, miLookLive2d, miRename;
     MenuItem miTalk, miTalkLocal, miTalkLlm, miLlmSetup;
+    MenuItem miMc, miMcLocal, miMcFrp, miMcCloud, miMcChat;
+    readonly McLink mc = new();
     Window planWin, shopWin, pantryWin;
 
     // 金币与工资
@@ -99,7 +101,10 @@ public partial class MainWindow : Window
 
         SourceInitialized += (s, e) => Native.SetClickThrough(this, false);
         Loaded += OnLoadedOnce;
-        Closing += (s, e) => Persist();
+        Closing += (s, e) => { mc.Stop(); Persist(); };
+        mc.Status += OnMcStatus;
+        mc.Chat += OnMcChat;
+        mc.Death += OnMcDeath;
 
         CompositionTarget.Rendering += OnFrame;
 
@@ -539,6 +544,17 @@ public partial class MainWindow : Window
         miTalk.Items.Add(new Separator());
         miTalk.Items.Add(miLlmSetup);
 
+        miMc = new MenuItem { Header = "我的世界" };
+        miMcLocal = Item("连接本机(127.0.0.1)", () => StartMc("127.0.0.1", 25565));
+        miMcFrp = Item("连接 Sakura FRP…", () => ShowFrpConnect());
+        miMcCloud = Item("连接云服务器…", () => ShowCloudConnect());
+        miMcChat = Item("MC中说句话…", ShowMcChatBox);
+        miMc.Items.Add(miMcLocal);
+        miMc.Items.Add(miMcFrp);
+        miMc.Items.Add(miMcCloud);
+        miMc.Items.Add(new Separator());
+        miMc.Items.Add(miMcChat);
+        miMcChat = Item("MC中说句话…", ShowMcChatBox);
         miRename = Item("给她改名…", ShowRename);
         miHide = Item("躲进托盘休息", HideToTray);
         miDir = Item("打开数据文件夹", () =>
@@ -570,6 +586,8 @@ public partial class MainWindow : Window
         petMenu.Items.Add(miScale);
 
         petMenu.Items.Add(miTalk);
+        petMenu.Items.Add(miMc);
+        petMenu.Items.Add(miMcChat);
         petMenu.Items.Add(miRename);
         petMenu.Items.Add(miHide);
         petMenu.Items.Add(miDir);
@@ -591,6 +609,10 @@ public partial class MainWindow : Window
         miLookLive2d.IsChecked = skinMode == "live2d";
         miTalkLocal.IsChecked = Store.Config.dialogueMode != "llm";
         miTalkLlm.IsChecked = Store.Config.dialogueMode == "llm";
+        miMcChat.IsEnabled = mc.Running;
+        miMcLocal.IsEnabled = !mc.Running;
+        miMcFrp.IsEnabled = !mc.Running;
+        miMcCloud.IsEnabled = !mc.Running;
         miHead.Header = (taskNow != null ? $"{PetName}(任务中:{taskNow})"
                       : sleeping ? $"{PetName}(睡觉中…小声点)"
                       : $"{PetName} · 快乐 {(int)state.Happy}/1000") + $" · 金币{coins}";
@@ -1318,8 +1340,244 @@ public partial class MainWindow : Window
         else HideToTray();
     }
 
+    void StartMc(string host, int port)
+    {
+        if (mc.Running) { mc.Stop(); }
+        Store.Config.mcHost = host;
+        Store.Config.mcPort = port;
+        Store.SaveConfig();
+        ShowBubble("吾去游戏里找主人~", 4);
+        mc.Start();
+    }
+
+    void ShowCloudConnect()
+    {
+        var win = new Window
+        {
+            Title = "连接云服务器",
+            Width = 360, Height = 140,
+            WindowStartupLocation = WindowStartupLocation.CenterScreen,
+            Background = new SolidColorBrush(Color.FromRgb(0x1a, 0x1a, 0x2e)),
+            Foreground = Brushes.White,
+            Topmost = true,
+            ResizeMode = ResizeMode.NoResize,
+        };
+        var sp = new StackPanel { Margin = new Thickness(10) };
+        sp.Children.Add(new TextBlock { Text = "服务器 IP 地址:", Foreground = Brushes.White, FontSize = 13, Margin = new Thickness(0, 0, 0, 4) });
+        var tbHost = new TextBox
+        {
+            Foreground = Brushes.White,
+            Background = new SolidColorBrush(Color.FromRgb(0x30, 0x30, 0x50)),
+            BorderBrush = new SolidColorBrush(Color.FromRgb(0xC9, 0xB4, 0xBE)),
+            FontSize = 14, Padding = new Thickness(4), Margin = new Thickness(0, 0, 0, 8),
+            Text = Store.Config.mcHost,
+        };
+        sp.Children.Add(tbHost);
+        var row = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
+        var tbPort = new TextBox
+        {
+            Foreground = Brushes.White,
+            Background = new SolidColorBrush(Color.FromRgb(0x30, 0x30, 0x50)),
+            BorderBrush = new SolidColorBrush(Color.FromRgb(0xC9, 0xB4, 0xBE)),
+            FontSize = 14, Padding = new Thickness(4), Width = 80, Margin = new Thickness(0, 0, 8, 0),
+            Text = Store.Config.mcPort > 0 ? Store.Config.mcPort.ToString() : "25565",
+        };
+        row.Children.Add(tbPort);
+        var btn = new Button
+        {
+            Content = "连接", Width = 80,
+            Background = new SolidColorBrush(Color.FromRgb(0xC9, 0xB4, 0xBE)),
+            Foreground = Brushes.White, FontSize = 14,
+        };
+        void Go()
+        {
+            string host = tbHost.Text.Trim();
+            if (int.TryParse(tbPort.Text.Trim(), out int port) && port > 0 && !string.IsNullOrWhiteSpace(host))
+            {
+                win.Close();
+                StartMc(host, port);
+            }
+        }
+        btn.Click += (s, e) => Go();
+        tbPort.KeyDown += (s, e) => { if (e.Key == System.Windows.Input.Key.Enter) Go(); };
+        row.Children.Add(btn);
+        sp.Children.Add(row);
+        win.Content = sp;
+        win.Show();
+        tbHost.Focus();
+    }
+
+    void ShowFrpConnect()
+    {
+        var win = new Window
+        {
+            Title = "连接 Sakura FRP",
+            Width = 360, Height = 140,
+            WindowStartupLocation = WindowStartupLocation.CenterScreen,
+            Background = new SolidColorBrush(Color.FromRgb(0x1a, 0x1a, 0x2e)),
+            Foreground = Brushes.White,
+            Topmost = true,
+            ResizeMode = ResizeMode.NoResize,
+        };
+        var sp = new StackPanel { Margin = new Thickness(10) };
+        sp.Children.Add(new TextBlock { Text = "服务器地址:", Foreground = Brushes.White, FontSize = 13, Margin = new Thickness(0, 0, 0, 4) });
+        var tbHost = new TextBox
+        {
+            Foreground = Brushes.White,
+            Background = new SolidColorBrush(Color.FromRgb(0x30, 0x30, 0x50)),
+            BorderBrush = new SolidColorBrush(Color.FromRgb(0xC9, 0xB4, 0xBE)),
+            FontSize = 14, Padding = new Thickness(4), Margin = new Thickness(0, 0, 0, 8),
+            Text = Store.Config.mcHost,
+        };
+        sp.Children.Add(tbHost);
+        var row = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
+        var tbPort = new TextBox
+        {
+            Foreground = Brushes.White,
+            Background = new SolidColorBrush(Color.FromRgb(0x30, 0x30, 0x50)),
+            BorderBrush = new SolidColorBrush(Color.FromRgb(0xC9, 0xB4, 0xBE)),
+            FontSize = 14, Padding = new Thickness(4), Width = 80, Margin = new Thickness(0, 0, 8, 0),
+            Text = Store.Config.mcPort > 0 ? Store.Config.mcPort.ToString() : "25565",
+        };
+        row.Children.Add(tbPort);
+        var btn = new Button
+        {
+            Content = "连接", Width = 80,
+            Background = new SolidColorBrush(Color.FromRgb(0xC9, 0xB4, 0xBE)),
+            Foreground = Brushes.White, FontSize = 14,
+        };
+        void Go()
+        {
+            string host = tbHost.Text.Trim();
+            if (int.TryParse(tbPort.Text.Trim(), out int port) && port > 0 && !string.IsNullOrWhiteSpace(host))
+            {
+                win.Close();
+                StartMc(host, port);
+            }
+        }
+        btn.Click += (s, e) => Go();
+        tbPort.KeyDown += (s, e) => { if (e.Key == System.Windows.Input.Key.Enter) Go(); };
+        row.Children.Add(btn);
+        sp.Children.Add(row);
+        win.Content = sp;
+        win.Show();
+        tbHost.Focus();
+    }
+
+    void OnMcStatus(string text)
+    {
+        Dispatcher.BeginInvoke(() =>
+        {
+            ShowBubble(text, 5);
+            if (text == "吾进游戏啦") mc.Say("/op " + McLink.GameName);
+        });
+    }
+
+    void OnMcDeath()
+    {
+        Dispatcher.BeginInvoke(() => ShowBubble("呜呜吾在游戏里挂了…", 5));
+    }
+
+    void OnMcChat(string msg)
+    {
+        Dispatcher.BeginInvoke(() =>
+        {
+            ShowBubble(msg.Length > 40 ? msg[..40] : msg, 6);
+            _ = ReplyInGame(msg);
+        });
+    }
+
+    async Task ReplyInGame(string msg)
+    {
+        string body = msg;
+        int a = msg.LastIndexOf('<'), b = msg.LastIndexOf('>');
+        string who = "主人";
+        if (a >= 0 && b > a) { who = msg.Substring(a + 1, b - a - 1); body = msg[(b + 1)..].Trim(); }
+        if (who == McLink.GameName || string.IsNullOrWhiteSpace(body)) return;
+
+        string reply = null;
+        string cmd = null;
+        if (LlmClient.Enabled)
+        {
+            string raw = await LlmClient.AskAsync(
+                "你在我的世界服务器里,已经是管理员。下面这句话来自玩家「" + who + "」:" + body + "\n" +
+                "如果这句话是在让你做事(传送、给物品、调时间、调天气、调模式等),只输出一条原版指令,以 / 开头,不要解释。\n" +
+                "传送某人到某处用 /tp 玩家名 目的地。玩家没说自己的游戏名时,目的地按他说的写。\n" +
+                "如果只是聊天,就用人设回一句中文,40字以内,不要以 / 开头。");
+            if (!string.IsNullOrWhiteSpace(raw))
+            {
+                raw = raw.Trim();
+                if (raw.StartsWith("/")) cmd = raw.Split('\n')[0].Trim();
+                else reply = raw;
+            }
+        }
+        if (cmd != null)
+        {
+            mc.Say(cmd);
+            Dispatcher.BeginInvoke(() => ShowBubble("好,吾去办:" + cmd, 5));
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(reply)) reply = Dialogue.Chat;
+        reply = reply.Replace("\r", " ").Replace("\n", " ").Trim();
+        if (reply.Length > 80) reply = reply[..80];
+        mc.Say(reply);
+        Dispatcher.BeginInvoke(() => ShowBubble(reply, 5));
+    }
+
+    void ShowMcChatBox()
+    {
+        if (!mc.Running) { ShowBubble("先点「进入我的世界」", 4); return; }
+        var win = new Window
+        {
+            Title = "MC 聊天",
+            Width = 340, Height = 120,
+            WindowStartupLocation = WindowStartupLocation.CenterScreen,
+            Background = new SolidColorBrush(Color.FromRgb(0x1a, 0x1a, 0x2e)),
+            Foreground = Brushes.White,
+            Topmost = true,
+            ResizeMode = ResizeMode.NoResize,
+        };
+        var sp = new StackPanel { Margin = new Thickness(10) };
+        var tb = new TextBox
+        {
+            Foreground = Brushes.White,
+            Background = new SolidColorBrush(Color.FromRgb(0x30, 0x30, 0x50)),
+            BorderBrush = new SolidColorBrush(Color.FromRgb(0xC9, 0xB4, 0xBE)),
+            FontSize = 14,
+            Padding = new Thickness(4),
+            Margin = new Thickness(0, 0, 0, 8),
+            AcceptsReturn = false,
+            MaxLength = 256,
+        };
+        var btn = new Button
+        {
+            Content = "发送",
+            Width = 80,
+            HorizontalAlignment = HorizontalAlignment.Right,
+            Background = new SolidColorBrush(Color.FromRgb(0xC9, 0xB4, 0xBE)),
+            Foreground = Brushes.White,
+        };
+        void Send()
+        {
+            if (!string.IsNullOrWhiteSpace(tb.Text))
+            {
+                mc.Say(tb.Text.Trim());
+                ShowBubble("已发送:" + tb.Text.Trim(), 4);
+            }
+            win.Close();
+        }
+        btn.Click += (s, e) => Send();
+        tb.KeyDown += (s, e) => { if (e.Key == System.Windows.Input.Key.Enter) Send(); };
+        sp.Children.Add(tb);
+        sp.Children.Add(btn);
+        win.Content = sp;
+        win.Show();
+        tb.Focus();
+    }
+
     void ExitApp()
     {
+        mc.Stop();
         Persist();
         Store.Log("========== 心海海 退出 ==========");
         mischief.Stop();
