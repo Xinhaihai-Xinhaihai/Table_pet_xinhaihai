@@ -12,11 +12,11 @@
 
 仓库本体**没有** `心海海.exe`（单文件约 154MB，超过 GitHub 普通文件 100MB 上限）。
 
-想直接玩，请到 **[Releases / v1.6.0](https://github.com/Xinhaihai-Xinhaihai/Table_pet_xinhaihai/releases/tag/v1.6.0)** 下载：
+想直接玩，请到 **[Releases / v1.6.1](https://github.com/Xinhaihai-Xinhaihai/Table_pet_xinhaihai/releases/tag/v1.6.1)** 下载：
 
 | 你点哪个 | 里面有什么 | 能不能直接玩 |
 |----------|------------|--------------|
-| **`Table_pet_xinhaihai_v1.6.0.zip`**（Windows 推荐） | `心海海.exe` + `skin` + `live2d` + `gif` + 源码 + README | **能**。解压后双击 exe |
+| **`Table_pet_xinhaihai_v1.6.1.zip`**（Windows 推荐） | `心海海.exe` + `skin` + `live2d` + `gif` + 源码 + README | **能**。解压后双击 exe |
 | **`xinhaihai-android-v1.0.1.apk`**（安卓） | 手机桌宠安装包 | **能**。允许未知来源后安装，首次请开悬浮窗权限 |
 | `Source code (zip/tar.gz)` | 只有源码和素材，**没有 exe / apk** | 不能。需要自己编译 |
 
@@ -29,7 +29,7 @@
 解压完整包后目录应是：
 
 ```
-Table_pet_xinhaihai_v1.6.0\
+Table_pet_xinhaihai_v1.6.1\
   心海海.exe     ← 启动器,双击运行（自包含,无需装 .NET）
   README.md
   skin\          ← PNG 自定义皮肤
