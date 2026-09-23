@@ -1,6 +1,6 @@
 # 心海海 · 桌宠 🌊
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../LICENSE)
 
 一只有情绪、要吃喝、有作息、会打工赚钱、会满屏溜达的 Windows 桌面宠物。形象为 Q 版矢量卡通(青绿长发 + 红瞳 + 红蝴蝶结,和风巫女短衫红裙),灵感致敬《千恋＊万花》丛雨。
 
@@ -12,12 +12,12 @@
 
 仓库本体**没有** `心海海.exe`（单文件约 154MB，超过 GitHub 普通文件 100MB 上限）。
 
-想直接玩，请到 **[Releases / v1.5.0](https://github.com/Xinhaihai-Xinhaihai/Table_pet_xinhaihai/releases/tag/v1.5.0)** 下载：
+想直接玩，请到 **[Releases / v1.6.0](https://github.com/Xinhaihai-Xinhaihai/Table_pet_xinhaihai/releases/tag/v1.6.0)** 下载：
 
 | 你点哪个 | 里面有什么 | 能不能直接玩 |
 |----------|------------|--------------|
-| **`Table_pet_xinhaihai_v1.5.0.zip`**（Windows 推荐） | `心海海.exe` + `skin` + `live2d` + `gif` + 源码 + README | **能**。解压后双击 exe |
-| **`xinhaihai-android-v1.0.0.apk`**（安卓） | 手机桌宠安装包 | **能**。允许未知来源后安装，首次请开悬浮窗权限 |
+| **`Table_pet_xinhaihai_v1.6.0.zip`**（Windows 推荐） | `心海海.exe` + `skin` + `live2d` + `gif` + 源码 + README | **能**。解压后双击 exe |
+| **`xinhaihai-android-v1.0.1.apk`**（安卓） | 手机桌宠安装包 | **能**。允许未知来源后安装，首次请开悬浮窗权限 |
 | `Source code (zip/tar.gz)` | 只有源码和素材，**没有 exe / apk** | 不能。需要自己编译 |
 
 > 已经有安卓版 1.0。商店、养成、长按菜单对齐电脑端；Live2D 暂未移植（电脑专用）。
@@ -29,7 +29,7 @@
 解压完整包后目录应是：
 
 ```
-Table_pet_xinhaihai_v1.5.0\
+Table_pet_xinhaihai_v1.6.0\
   心海海.exe     ← 启动器,双击运行（自包含,无需装 .NET）
   README.md
   skin\          ← PNG 自定义皮肤
@@ -45,7 +45,7 @@ Table_pet_xinhaihai_v1.5.0\
 
 ## 安卓版
 
-手机也能养她。到同一页 Releases 下 **`xinhaihai-android-v1.0.0.apk`**，允许未知来源后安装。
+手机也能养她。到同一页 Releases 下 **`xinhaihai-android-v1.0.1.apk`**，允许未知来源后安装。
 
 - 首次打开请给**悬浮窗**权限，她才会浮在桌面上。
 - 长按她：摸摸头 / 逗她玩 / 聊天、商店、投喂、状态、今日计划、外观、改名、听歌、睡觉等，和电脑端菜单对齐。
@@ -73,6 +73,7 @@ Table_pet_xinhaihai_v1.5.0\
 | **双对话模式** | 右键 →「对话模式」随时切换:**本地台词**(JSON 随机抽,离线零延迟)/ **大模型对话**(接 OpenAI 兼容接口,按可改人设即时生成);大模型 6 秒没回就静默跳过本次台词,快乐值等其它功能照常 |
 | **自定义名字** | 右键 →「给她改名…」:菜单、托盘、各窗口标题、台词里的名字全部跟着改 |
 | **主动撒娇** | 定时弹气泡求陪伴/讨吃的,越无聊/越饿催得越勤 |
+| **进 MC 聊天** | 右键「我的世界」→ 连接本机/连接 Sakura FRP;游戏里别人说话,大模型判断是聊天就回话、是指令(如「把我tp到xxx」)就自动执行;原版/Fabric/Forge/NeoForge 通用,不装模组 |
 | **置顶不扰** | 每 2 秒重新置顶(压过别人的强制置顶),永不抢焦点、不进 Alt+Tab |
 | **后台常驻** | 单文件 exe、托盘常驻、单实例 |
 
@@ -242,7 +243,56 @@ dotnet publish -c Release -r win-x64 --self-contained true `
 | `Shop.cs` | 16 件礼物与稀有度定价 |
 | `Pantry.cs` | 12 食物 + 12 饮料(投喂) |
 | `MouseMischief.cs` / `MusicLauncher.cs` / `AudioMeter.cs` | 抢鼠标 / 探测并启动播放器 / 系统音量峰值检测(听歌模式) |
+| `McLink.cs` | 桌宠进 MC:进程管理、收发消息 |
 | `Dialogue.cs` / `Native.cs` / `Config.cs` | 台词 / Win32(置顶·鼠标·媒体键) / 配置持久化 |
+
+## 我的世界(Minecraft)联机
+
+桌宠可以进入 MC 服务器聊天、互动、执行指令,原版/Fabric/Forge/NeoForge 全版本通用,不装模组。
+
+### 前置要求
+
+- [Node.js](https://nodejs.org)(v18+)
+- 在 `mc/` 目录下执行 `npm install`(首次安装 mineflayer 依赖)
+
+### 怎么连接
+
+右键桌宠 → **我的世界**:
+
+| 选项 | 说明 |
+|------|------|
+| **连接本机(127.0.0.1)** | 你自己的电脑开了 MC 服,直接点这个 |
+| **连接 Sakura FRP…** | 别人的服、或者用内网穿透,弹窗填服务器地址和端口,点连接 |
+
+### 你的服怎么开
+
+最简单:桌面上开 MC → 对局域网开放 → 记下端口号(比如 25565) → 桌宠点「连接本机」。
+
+也可以用原版服务端、Forge 服务端、Fabric 服务端等。确保 `server.properties` 里 `online-mode=false`(离线服),桌宠才能连上。
+
+### 自动拿 OP
+
+桌宠进服后会自动发 `/op XinHaiHai`。如果没生效(有些服第一次需要手动),在游戏里打 `/op XinHaiHai` 即可。
+
+### 游戏内聊天
+
+- 游戏里别人说话 → 桌宠用大模型判断:
+  - **聊天** → 用人设回话(气泡 + 游戏内发言)
+  - **指令**(如「把我tp到xxx」) → 自动执行 `/tp XinHaiHai xxx`
+  - 没配大模型 → 回本地台词,不执行指令
+- 右键 → **我的世界** → **MC中说句话…** → 弹窗打字回车直接发到游戏
+
+### Sakura FRP 穿透
+
+服不在本机时:
+
+1. 装了服务器的那台电脑上装 [Sakura FRP](https://www.natfrp.com),建一个 TCP 隧道,本地端口填 25565
+2. 启动隧道,记下分配的域名(如 `xxxxxx.frcp.cn`)
+3. 桌宠右键 → 我的世界 → 连接 Sakura FRP → 地址填域名,端口填 25565 → 连接
+
+### 支持的版本
+
+原版 1.8~1.21+ / Fabric / Forge / NeoForge 全部通用。桌宠不装模组,只用登录协议连服。服务器需要 `online-mode=false`。
 
 ## 赞助
 
@@ -254,13 +304,13 @@ dotnet publish -c Release -r win-x64 --self-contained true `
 微信 / 支付宝均可扫码:
 
 <p>
-<img src="XinHaiHai/docs/sponsor.png" alt="微信支付" width="280">
-<img src="XinHaiHai/docs/sponsor.jpg" alt="支付宝" width="280">
+<img src="docs/sponsor.png" alt="微信支付" width="280">
+<img src="docs/sponsor.jpg" alt="支付宝" width="280">
 </p>
 
 ## 开源协议
 
-本项目以 [MIT License](LICENSE) 开源。
+本项目以 [MIT License](../LICENSE) 开源。
 
 第三方素材请遵守原作者条款:`skin` / `live2d` / `gif` 为示例或用户自备资源,官方游戏立绘版权归原权利人所有,本程序未使用官方图片。
 
