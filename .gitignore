@@ -2,6 +2,7 @@ bin/
 obj/
 publish/
 node_modules/
+*.zip
 .idea/
 .vs/
 *.user
