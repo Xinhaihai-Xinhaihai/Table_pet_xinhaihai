@@ -6,3 +6,16 @@ node_modules/
 .vs/
 *.user
 *.DotSettings.user
+
+# MC server files
+mc/libraries/
+mc/versions/
+mc/world/
+mc/logs/
+mc/banned-*.json
+mc/whitelist.json
+mc/ops.json
+mc/server.jar
+mc/server.properties
+mc/eula.txt
+mc/usercache.json
