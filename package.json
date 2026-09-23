@@ -1,0 +1,19 @@
+{
+  "name": "xinhaihai",
+  "version": "1.0.0",
+  "description": "[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../LICENSE)",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "minecraft-protocol": "^1.47.0",
+    "mineflayer": "^4.27.0"
+  }
+}

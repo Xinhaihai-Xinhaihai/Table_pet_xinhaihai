@@ -1,0 +1,8 @@
+bin/
+obj/
+publish/
+node_modules/
+.idea/
+.vs/
+*.user
+*.DotSettings.user
