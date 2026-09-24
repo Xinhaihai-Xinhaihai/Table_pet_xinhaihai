@@ -1484,7 +1484,7 @@ public partial class MainWindow : Window
         var win = new Window
         {
             Title = "连接云服务器",
-            Width = 360, Height = 140,
+            Width = 360, Height = 130,
             WindowStartupLocation = WindowStartupLocation.CenterScreen,
             Background = new SolidColorBrush(Color.FromRgb(0x1a, 0x1a, 0x2e)),
             Foreground = Brushes.White,
@@ -1503,15 +1503,6 @@ public partial class MainWindow : Window
         };
         sp.Children.Add(tbHost);
         var row = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
-        var tbPort = new TextBox
-        {
-            Foreground = Brushes.White,
-            Background = new SolidColorBrush(Color.FromRgb(0x30, 0x30, 0x50)),
-            BorderBrush = new SolidColorBrush(Color.FromRgb(0xC9, 0xB4, 0xBE)),
-            FontSize = 14, Padding = new Thickness(4), Width = 80, Margin = new Thickness(0, 0, 8, 0),
-            Text = Store.Config.mcPort > 0 ? Store.Config.mcPort.ToString() : "25565",
-        };
-        row.Children.Add(tbPort);
         var btn = new Button
         {
             Content = "连接", Width = 80,
@@ -1521,14 +1512,14 @@ public partial class MainWindow : Window
         void Go()
         {
             string host = tbHost.Text.Trim();
-            if (int.TryParse(tbPort.Text.Trim(), out int port) && port > 0 && !string.IsNullOrWhiteSpace(host))
+            if (!string.IsNullOrWhiteSpace(host))
             {
                 win.Close();
-                StartMc(host, port);
+                StartMc(host, 25565);
             }
         }
         btn.Click += (s, e) => Go();
-        tbPort.KeyDown += (s, e) => { if (e.Key == System.Windows.Input.Key.Enter) Go(); };
+        tbHost.KeyDown += (s, e) => { if (e.Key == System.Windows.Input.Key.Enter) Go(); };
         row.Children.Add(btn);
         sp.Children.Add(row);
         win.Content = sp;
@@ -1571,7 +1562,7 @@ public partial class MainWindow : Window
         var win = new Window
         {
             Title = "局域网/内网穿透",
-            Width = 360, Height = 140,
+            Width = 360, Height = 130,
             WindowStartupLocation = WindowStartupLocation.CenterScreen,
             Background = new SolidColorBrush(Color.FromRgb(0x1a, 0x1a, 0x2e)),
             Foreground = Brushes.White,
@@ -1579,7 +1570,7 @@ public partial class MainWindow : Window
             ResizeMode = ResizeMode.NoResize,
         };
         var sp = new StackPanel { Margin = new Thickness(10) };
-        sp.Children.Add(new TextBlock { Text = "服务器地址:", Foreground = Brushes.White, FontSize = 13, Margin = new Thickness(0, 0, 0, 4) });
+        sp.Children.Add(new TextBlock { Text = "服务器地址(IP 或域名):", Foreground = Brushes.White, FontSize = 13, Margin = new Thickness(0, 0, 0, 4) });
         var tbHost = new TextBox
         {
             Foreground = Brushes.White,
@@ -1590,15 +1581,6 @@ public partial class MainWindow : Window
         };
         sp.Children.Add(tbHost);
         var row = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
-        var tbPort = new TextBox
-        {
-            Foreground = Brushes.White,
-            Background = new SolidColorBrush(Color.FromRgb(0x30, 0x30, 0x50)),
-            BorderBrush = new SolidColorBrush(Color.FromRgb(0xC9, 0xB4, 0xBE)),
-            FontSize = 14, Padding = new Thickness(4), Width = 80, Margin = new Thickness(0, 0, 8, 0),
-            Text = Store.Config.mcPort > 0 ? Store.Config.mcPort.ToString() : "25565",
-        };
-        row.Children.Add(tbPort);
         var btn = new Button
         {
             Content = "连接", Width = 80,
@@ -1608,14 +1590,14 @@ public partial class MainWindow : Window
         void Go()
         {
             string host = tbHost.Text.Trim();
-            if (int.TryParse(tbPort.Text.Trim(), out int port) && port > 0 && !string.IsNullOrWhiteSpace(host))
+            if (!string.IsNullOrWhiteSpace(host))
             {
                 win.Close();
-                StartMc(host, port);
+                StartMc(host, 25565);
             }
         }
         btn.Click += (s, e) => Go();
-        tbPort.KeyDown += (s, e) => { if (e.Key == System.Windows.Input.Key.Enter) Go(); };
+        tbHost.KeyDown += (s, e) => { if (e.Key == System.Windows.Input.Key.Enter) Go(); };
         row.Children.Add(btn);
         sp.Children.Add(row);
         win.Content = sp;
