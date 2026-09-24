@@ -109,19 +109,15 @@ public sealed class McLink : IDisposable
 
     static string FindNode()
     {
-        // 0. 用户手动指定的路径
         string custom = Store.Config.nodePath;
         if (!string.IsNullOrWhiteSpace(custom) && File.Exists(custom)) return custom;
 
-        // 1. 优先从 mc/ 目录找(用户把 node.exe 放这里最方便)
         string exeDir = Path.GetDirectoryName(Environment.ProcessPath) ?? AppContext.BaseDirectory;
         string mcNode = Path.Combine(exeDir, "mc", "node.exe");
         if (File.Exists(mcNode)) return mcNode;
-        // 也试 AppContext.BaseDirectory
         string mcNode2 = Path.Combine(AppContext.BaseDirectory, "mc", "node.exe");
         if (File.Exists(mcNode2)) return mcNode2;
 
-        // 2. 系统 PATH
         string path = Environment.GetEnvironmentVariable("PATH") ?? "";
         foreach (string dir in path.Split(Path.PathSeparator))
         {
@@ -133,17 +129,13 @@ public sealed class McLink : IDisposable
             catch { }
         }
 
-        // 3. 常见安装位置
-        string[] common = {
-            @"C:\Program Files
-odejs
-ode.exe",
-            @"C:\Program Files (x86)
-odejs
-ode.exe",
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"Programs
-ode
-ode.exe"),
+        string progFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+        string progFiles86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+        string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        string[] common = new string[] {
+            Path.Combine(progFiles, "nodejs", "node.exe"),
+            Path.Combine(progFiles86, "nodejs", "node.exe"),
+            Path.Combine(localAppData, "Programs", "node", "node.exe"),
         };
         foreach (string c in common)
             if (File.Exists(c)) return c;
