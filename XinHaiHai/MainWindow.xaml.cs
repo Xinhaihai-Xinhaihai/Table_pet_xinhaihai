@@ -31,7 +31,7 @@ public partial class MainWindow : Window
     MenuItem miHead, miPat, miPlay, miChat, miShop, miStatus, miFood, miDrink, miPlan, miReplan, miHide, miDir, miExit;
     MenuItem miLook, miLookOfficial, miLookCustom, miLookGif, miLookLive2d, miRename;
     MenuItem miTalk, miTalkLocal, miTalkLlm, miLlmSetup;
-    MenuItem miMc, miMcLocal, miMcFrp, miMcCloud, miMcChat;
+    MenuItem miMc, miMcLocal, miMcLan, miMcFrp, miMcCloud, miMcChat;
     readonly McLink mc = new();
     Window planWin, shopWin, pantryWin;
 
@@ -546,10 +546,12 @@ public partial class MainWindow : Window
 
         miMc = new MenuItem { Header = "我的世界" };
         miMcLocal = Item("连接本机(127.0.0.1)", () => StartMc("127.0.0.1", 25565));
-        miMcFrp = Item("连接 Sakura FRP…", () => ShowFrpConnect());
+        miMcLan = Item("连接局域网…", ShowLanConnect);
+        miMcFrp = Item("局域网/内网穿透…", () => ShowFrpConnect());
         miMcCloud = Item("连接云服务器…", () => ShowCloudConnect());
         miMcChat = Item("MC中说句话…", ShowMcChatBox);
         miMc.Items.Add(miMcLocal);
+        miMc.Items.Add(miMcLan);
         miMc.Items.Add(miMcFrp);
         miMc.Items.Add(miMcCloud);
         miMc.Items.Add(new Separator());
@@ -611,6 +613,7 @@ public partial class MainWindow : Window
         miTalkLlm.IsChecked = Store.Config.dialogueMode == "llm";
         miMcChat.IsEnabled = mc.Running;
         miMcLocal.IsEnabled = !mc.Running;
+        miMcLan.IsEnabled = !mc.Running;
         miMcFrp.IsEnabled = !mc.Running;
         miMcCloud.IsEnabled = !mc.Running;
         miHead.Header = (taskNow != null ? $"{PetName}(任务中:{taskNow})"
@@ -1350,6 +1353,131 @@ public partial class MainWindow : Window
         mc.Start();
     }
 
+    void ShowLanConnect()
+    {
+        var win = new Window
+        {
+            Title = "连接局域网",
+            Width = 400, Height = 300,
+            WindowStartupLocation = WindowStartupLocation.CenterScreen,
+            Background = new SolidColorBrush(Color.FromRgb(0x1a, 0x1a, 0x2e)),
+            Foreground = Brushes.White,
+            Topmost = true,
+            ResizeMode = ResizeMode.NoResize,
+        };
+        var sp = new StackPanel { Margin = new Thickness(10) };
+        sp.Children.Add(new TextBlock { Text = "正在扫描局域网 MC 服务器…", Foreground = Brushes.White, FontSize = 13, Margin = new Thickness(0, 0, 0, 8) });
+
+        var lb = new ListBox
+        {
+            Background = new SolidColorBrush(Color.FromRgb(0x30, 0x30, 0x50)),
+            BorderBrush = new SolidColorBrush(Color.FromRgb(0xC9, 0xB4, 0xBE)),
+            Foreground = Brushes.White,
+            Height = 150,
+            Margin = new Thickness(0, 0, 0, 8),
+        };
+        sp.Children.Add(lb);
+
+        var row = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
+        var btnManual = new Button { Content = "手动输入", Width = 90, Margin = new Thickness(0, 0, 8, 0), Background = new SolidColorBrush(Color.FromRgb(0xC9, 0xB4, 0xBE)), Foreground = Brushes.White };
+        var btnConn = new Button { Content = "连接", Width = 80, Background = new SolidColorBrush(Color.FromRgb(0xC9, 0xB4, 0xBE)), Foreground = Brushes.White };
+        btnConn.Click += (s, e) =>
+        {
+            if (lb.SelectedItem is string selected)
+            {
+                var parts = selected.Split('|');
+                win.Close();
+                StartMc(parts[0].Trim(), int.TryParse(parts[1].Trim(), out int p) ? p : 25565);
+            }
+        };
+        btnManual.Click += (s, e) => { win.Close(); ShowCloudConnect(); };
+        row.Children.Add(btnManual);
+        row.Children.Add(btnConn);
+        sp.Children.Add(row);
+        win.Content = sp;
+        win.Show();
+
+        _ = ScanLanAsync(lb, sp.Children[0] as TextBlock);
+    }
+
+    async Task ScanLanAsync(ListBox lb, TextBlock status)
+    {
+        var clients = new System.Net.NetworkInformation.Ping();
+        var subnets = new List<string>();
+
+        // get local IP segments
+        try
+        {
+            var host = System.Net.Dns.GetHostName();
+            var ips = System.Net.Dns.GetHostEntry(host).AddressList;
+            foreach (var ip in ips)
+            {
+                if (ip.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                {
+                    var bytes = ip.GetAddressBytes();
+                    if (bytes[0] == 192 && bytes[1] == 168)
+                        subnets.Add($"{bytes[0]}.{bytes[1]}.{bytes[2]}");
+                    else if (bytes[0] == 10)
+                        subnets.Add($"{bytes[0]}.{bytes[1]}.{bytes[2]}");
+                    else if (bytes[0] == 172 && bytes[1] >= 16 && bytes[1] <= 31)
+                        subnets.Add($"{bytes[0]}.{bytes[1]}.{bytes[2]}");
+                }
+            }
+        }
+        catch { }
+
+        if (subnets.Count == 0) { Dispatcher.BeginInvoke(() => status.Text = "未检测到局域网"); return; }
+
+        status.Text = $"正在扫描 {subnets[0]}.x …";
+        var found = new List<(string ip, int port)>();
+        var tasks = new List<Task>();
+        var sem = new System.Threading.SemaphoreSlim(50);
+
+        foreach (var subnet in subnets)
+        {
+            for (int i = 1; i <= 254; i++)
+            {
+                string ip = $"{subnet}.{i}";
+                tasks.Add(Task.Run(async () =>
+                {
+                    await sem.WaitAsync();
+                    try
+                    {
+                        var reply = await clients.SendPingAsync(ip, 200);
+                        if (reply.Status == System.Net.NetworkInformation.IPStatus.Success)
+                        {
+                            // try common MC ports
+                            foreach (int port in new[] { 25565, 25575, 25566 })
+                            {
+                                try
+                                {
+                                    using var tcp = new System.Net.Sockets.TcpClient();
+                                    var connectTask = tcp.ConnectAsync(ip, port);
+                                    if (await Task.WhenAny(connectTask, Task.Delay(300)) == connectTask && tcp.Connected)
+                                    {
+                                        lock (found) found.Add((ip, port));
+                                        Dispatcher.BeginInvoke(() => lb.Items.Add($"{ip} | {port}"));
+                                        tcp.Close();
+                                        break;
+                                    }
+                                }
+                                catch { }
+                            }
+                        }
+                    }
+                    catch { }
+                    finally { sem.Release(); }
+                }));
+            }
+        }
+
+        await Task.WhenAll(tasks);
+        Dispatcher.BeginInvoke(() =>
+            status.Text = found.Count > 0
+                ? $"找到 {found.Count} 台服务器,选一台点连接"
+                : "未发现 MC 服务器,可以点「手动输入」");
+    }
+
     void ShowCloudConnect()
     {
         var win = new Window
@@ -1411,7 +1539,7 @@ public partial class MainWindow : Window
     {
         var win = new Window
         {
-            Title = "连接 Sakura FRP",
+            Title = "局域网/内网穿透",
             Width = 360, Height = 140,
             WindowStartupLocation = WindowStartupLocation.CenterScreen,
             Background = new SolidColorBrush(Color.FromRgb(0x1a, 0x1a, 0x2e)),
