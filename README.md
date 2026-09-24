@@ -253,7 +253,7 @@ dotnet publish -c Release -r win-x64 --self-contained true `
 ### 前置要求
 
 - [Node.js](https://nodejs.org)(v18+)
-- 右键桌宠 → 我的世界 → **安装MC模块** 一键安装(首次需要);也可以在 `mc/` 目录下手动 `npm install`
+- 右键桌宠 → 我的世界 → **安装MC模块** 一键安装(首次使用前点一下,需要先装好 [Node.js](https://nodejs.org))
 
 ### 怎么连接
 
