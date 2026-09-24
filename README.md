@@ -252,8 +252,11 @@ dotnet publish -c Release -r win-x64 --self-contained true `
 
 ### 前置要求
 
-- [Node.js](https://nodejs.org)(v18+)
-- 右键桌宠 → 我的世界 → **安装MC模块** 一键安装(首次使用前点一下,需要先装好 [Node.js](https://nodejs.org))
+1. 安装 [Node.js](https://nodejs.org)(v18+),直接用默认设置一路下一步就行,不需要改安装路径
+2. 装完后打开命令提示符(按 Win+R 输入 `cmd` 回车),输入 `node -v`,能看到版本号就说明装好了
+3. 右键桌宠 → 我的世界 → **安装MC模块**,一键完成,不需要手动操作
+
+Node.js 装在系统默认位置(C盘)就行,桌宠会自动从系统 PATH 里找到它。
 
 ### 怎么连接
 
