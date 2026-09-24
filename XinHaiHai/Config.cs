@@ -77,6 +77,8 @@ public class AppConfig
     public int mcPort { get; set; } = 25565;
     /// <summary>node.exe 完整路径;留空则自动查找。</summary>
     public string nodePath { get; set; } = "";
+    /// <summary>MC 游戏内名字,只能英文,用于进服和 OP。</summary>
+    public string mcGameName { get; set; } = "XinHaiHai";
 }
 
 /// <summary>跨启动保存的桌宠状态。</summary>
