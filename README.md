@@ -258,11 +258,14 @@ dotnet publish -c Release -r win-x64 --self-contained true `
 4. 装完后右键桌宠 → 我的世界 → **安装MC模块**,一键完成
 
 **桌宠查找 node 的顺序:**
-1. `mc/node.exe`(最推荐,放这里最稳)
-2. 系统 PATH 环境变量里的 node
-3. `C:\Program Files\nodejs\node.exe`
-4. `C:\Program Files (x86)\nodejs\node.exe`
-5. `%LocalAppData%\Programs\node\node.exe`
+1. 右键 → 我的世界 → **设置node.exe路径** 手动指定(最稳)
+2. `mc/node.exe`(推荐,放这里最方便)
+3. 系统 PATH 环境变量里的 node
+4. `C:\Program Files\nodejs\node.exe`
+5. `C:\Program Files (x86)\nodejs\node.exe`
+6. `%LocalAppData%\Programs\node\node.exe`
+
+如果自动找不到,右键 → 我的世界 → 设置node.exe路径,手动选 node.exe 文件即可。
 
 ### 怎么连接
 
