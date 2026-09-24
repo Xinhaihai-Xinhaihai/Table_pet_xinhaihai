@@ -31,7 +31,7 @@ public partial class MainWindow : Window
     MenuItem miHead, miPat, miPlay, miChat, miShop, miStatus, miFood, miDrink, miPlan, miReplan, miHide, miDir, miExit;
     MenuItem miLook, miLookOfficial, miLookCustom, miLookGif, miLookLive2d, miRename;
     MenuItem miTalk, miTalkLocal, miTalkLlm, miLlmSetup;
-    MenuItem miMc, miMcLocal, miMcLan, miMcFrp, miMcCloud, miMcChat, miMcInstall, miMcNode;
+    MenuItem miMc, miMcLocal, miMcLan, miMcFrp, miMcCloud, miMcChat, miMcInstall, miMcNode, miMcName;
     readonly McLink mc = new();
     Window planWin, shopWin, pantryWin;
 
@@ -595,6 +595,7 @@ public partial class MainWindow : Window
         petMenu.Items.Add(miMc);
         petMenu.Items.Add(miMcChat);
         petMenu.Items.Add(miRename);
+        petMenu.Items.Add(miMcName);
         petMenu.Items.Add(miHide);
         petMenu.Items.Add(miDir);
         petMenu.Items.Add(new Separator());
@@ -616,10 +617,10 @@ public partial class MainWindow : Window
         miTalkLocal.IsChecked = Store.Config.dialogueMode != "llm";
         miTalkLlm.IsChecked = Store.Config.dialogueMode == "llm";
         miMcChat.IsEnabled = mc.Running;
-        miMcLocal.IsEnabled = !mc.Running;
-        miMcLan.IsEnabled = !mc.Running;
-        miMcFrp.IsEnabled = !mc.Running;
-        miMcCloud.IsEnabled = !mc.Running;
+        miMcLocal.IsEnabled = true;
+        miMcLan.IsEnabled = true;
+        miMcFrp.IsEnabled = true;
+        miMcCloud.IsEnabled = true;
         miHead.Header = (taskNow != null ? $"{PetName}(任务中:{taskNow})"
                       : sleeping ? $"{PetName}(睡觉中…小声点)"
                       : $"{PetName} · 快乐 {(int)state.Happy}/1000") + $" · 金币{coins}";
@@ -1349,7 +1350,11 @@ public partial class MainWindow : Window
 
     void StartMc(string host, int port)
     {
-        if (mc.Running) { mc.Stop(); }
+        if (mc.Running)
+        {
+            mc.Stop();
+            ShowBubble("先断开,重新连接~", 3);
+        }
         Store.Config.mcHost = host;
         Store.Config.mcPort = port;
         Store.SaveConfig();
@@ -1529,6 +1534,50 @@ public partial class MainWindow : Window
         tbHost.Focus();
     }
 
+    void ShowMcNameSetup()
+    {
+        string current = Store.Config.mcGameName;
+        var win = new Window
+        {
+            Title = "MC 游戏名(只能英文)",
+            Width = 360, Height = 130,
+            WindowStartupLocation = WindowStartupLocation.CenterScreen,
+            Background = new SolidColorBrush(Color.FromRgb(0x1a, 0x1a, 0x2e)),
+            Foreground = Brushes.White,
+            Topmost = true,
+            ResizeMode = ResizeMode.NoResize,
+        };
+        var sp = new StackPanel { Margin = new Thickness(10) };
+        sp.Children.Add(new TextBlock { Text = "游戏内显示的名字(只能英文,如 XinHaiHai):", Foreground = Brushes.White, FontSize = 12, Margin = new Thickness(0, 0, 0, 8) });
+        var tb = new TextBox
+        {
+            Foreground = Brushes.White,
+            Background = new SolidColorBrush(Color.FromRgb(0x30, 0x30, 0x50)),
+            BorderBrush = new SolidColorBrush(Color.FromRgb(0xC9, 0xB4, 0xBE)),
+            FontSize = 14, Padding = new Thickness(4), Margin = new Thickness(0, 0, 0, 8),
+            Text = current,
+        };
+        sp.Children.Add(tb);
+        var row = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
+        var btn = new Button { Content = "保存", Width = 80, Background = new SolidColorBrush(Color.FromRgb(0xC9, 0xB4, 0xBE)), Foreground = Brushes.White };
+        btn.Click += (s, e) =>
+        {
+            string val = tb.Text.Trim();
+            if (string.IsNullOrWhiteSpace(val)) { ShowBubble("名字不能为空", 3); return; }
+            if (!System.Text.RegularExpressions.Regex.IsMatch(val, @"^[a-zA-Z0-9_]+$")) { ShowBubble("只能填英文和数字", 3); return; }
+            Store.Config.mcGameName = val;
+            Store.SaveConfig();
+            ShowBubble("MC游戏名已改为:" + val, 4);
+            win.Close();
+        };
+        tb.KeyDown += (s, e) => { if (e.Key == System.Windows.Input.Key.Enter) btn.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Primitives.ButtonBase.ClickEvent)); };
+        row.Children.Add(btn);
+        sp.Children.Add(row);
+        win.Content = sp;
+        win.Show();
+        tb.Focus();
+    }
+
     void ShowNodePathSetup()
     {
         string current = Store.Config.nodePath;
@@ -1673,7 +1722,7 @@ public partial class MainWindow : Window
     {
         Dispatcher.BeginInvoke(() =>
         {
-            ShowBubble(msg.Length > 40 ? msg[..40] : msg, 6);
+            ShowBubble(msg.Length > 40 ? msg[..40] : msg, 8);
             _ = ReplyInGame(msg);
         });
     }
