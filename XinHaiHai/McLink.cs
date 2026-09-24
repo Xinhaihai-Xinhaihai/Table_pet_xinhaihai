@@ -10,7 +10,7 @@ namespace XinHaiHai;
 /// </summary>
 public sealed class McLink : IDisposable
 {
-    public const string GameName = "XinHaiHai";
+    public static string GameName => string.IsNullOrWhiteSpace(Store.Config?.mcGameName) ? "XinHaiHai" : Store.Config.mcGameName.Trim();
 
     Process proc;
     readonly StringBuilder buf = new();
