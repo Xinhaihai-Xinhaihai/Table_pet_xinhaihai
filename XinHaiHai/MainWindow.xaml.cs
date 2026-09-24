@@ -31,7 +31,7 @@ public partial class MainWindow : Window
     MenuItem miHead, miPat, miPlay, miChat, miShop, miStatus, miFood, miDrink, miPlan, miReplan, miHide, miDir, miExit;
     MenuItem miLook, miLookOfficial, miLookCustom, miLookGif, miLookLive2d, miRename;
     MenuItem miTalk, miTalkLocal, miTalkLlm, miLlmSetup;
-    MenuItem miMc, miMcLocal, miMcLan, miMcFrp, miMcCloud, miMcChat, miMcInstall;
+    MenuItem miMc, miMcLocal, miMcLan, miMcFrp, miMcCloud, miMcChat, miMcInstall, miMcNode;
     readonly McLink mc = new();
     Window planWin, shopWin, pantryWin;
 
@@ -556,8 +556,10 @@ public partial class MainWindow : Window
         miMc.Items.Add(miMcFrp);
         miMc.Items.Add(miMcCloud);
         miMc.Items.Add(new Separator());
+        miMcNode = Item("设置node.exe路径…", ShowNodePathSetup);
         miMc.Items.Add(miMcChat);
         miMc.Items.Add(miMcInstall);
+        miMc.Items.Add(miMcNode);
         miMcChat = Item("MC中说句话…", ShowMcChatBox);
         miRename = Item("给她改名…", ShowRename);
         miHide = Item("躲进托盘休息", HideToTray);
@@ -1525,6 +1527,54 @@ public partial class MainWindow : Window
         win.Content = sp;
         win.Show();
         tbHost.Focus();
+    }
+
+    void ShowNodePathSetup()
+    {
+        string current = Store.Config.nodePath;
+        string mcDir = Path.Combine(AppContext.BaseDirectory, "mc");
+        string hint = string.IsNullOrWhiteSpace(current) ? $"留空=自动查找\n推荐:把 node.exe 复制到 {mcDir}" : $"当前:{current}";
+
+        var win = new Window
+        {
+            Title = "设置 node.exe 路径",
+            Width = 420, Height = 150,
+            WindowStartupLocation = WindowStartupLocation.CenterScreen,
+            Background = new SolidColorBrush(Color.FromRgb(0x1a, 0x1a, 0x2e)),
+            Foreground = Brushes.White,
+            Topmost = true,
+            ResizeMode = ResizeMode.NoResize,
+        };
+        var sp = new StackPanel { Margin = new Thickness(10) };
+        sp.Children.Add(new TextBlock { Text = hint, Foreground = Brushes.White, FontSize = 12, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 0, 0, 8) });
+        var tb = new TextBox
+        {
+            Foreground = Brushes.White,
+            Background = new SolidColorBrush(Color.FromRgb(0x30, 0x30, 0x50)),
+            BorderBrush = new SolidColorBrush(Color.FromRgb(0xC9, 0xB4, 0xBE)),
+            FontSize = 13, Padding = new Thickness(4), Margin = new Thickness(0, 0, 0, 8),
+            Text = current,
+        };
+        sp.Children.Add(tb);
+        var row = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
+        var btnClear = new Button { Content = "恢复自动", Width = 80, Margin = new Thickness(0, 0, 8, 0), Background = new SolidColorBrush(Color.FromRgb(0xC9, 0xB4, 0xBE)), Foreground = Brushes.White };
+        var btnSave = new Button { Content = "保存", Width = 80, Background = new SolidColorBrush(Color.FromRgb(0xC9, 0xB4, 0xBE)), Foreground = Brushes.White };
+        btnClear.Click += (s, e) => { Store.Config.nodePath = ""; Store.SaveConfig(); ShowBubble("已恢复自动查找", 3); win.Close(); };
+        btnSave.Click += (s, e) =>
+        {
+            string val = tb.Text.Trim();
+            if (!string.IsNullOrWhiteSpace(val) && !File.Exists(val)) { ShowBubble("文件不存在", 3); return; }
+            Store.Config.nodePath = val;
+            Store.SaveConfig();
+            ShowBubble("已保存", 3);
+            win.Close();
+        };
+        row.Children.Add(btnClear);
+        row.Children.Add(btnSave);
+        sp.Children.Add(row);
+        win.Content = sp;
+        win.Show();
+        tb.Focus();
     }
 
     void InstallMcModule()
