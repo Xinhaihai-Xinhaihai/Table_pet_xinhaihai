@@ -109,10 +109,17 @@ public sealed class McLink : IDisposable
 
     static string FindNode()
     {
+        // 0. 用户手动指定的路径
+        string custom = Store.Config.nodePath;
+        if (!string.IsNullOrWhiteSpace(custom) && File.Exists(custom)) return custom;
+
         // 1. 优先从 mc/ 目录找(用户把 node.exe 放这里最方便)
-        string mcDir = Path.Combine(AppContext.BaseDirectory, "mc");
-        string mcNode = Path.Combine(mcDir, "node.exe");
+        string exeDir = Path.GetDirectoryName(Environment.ProcessPath) ?? AppContext.BaseDirectory;
+        string mcNode = Path.Combine(exeDir, "mc", "node.exe");
         if (File.Exists(mcNode)) return mcNode;
+        // 也试 AppContext.BaseDirectory
+        string mcNode2 = Path.Combine(AppContext.BaseDirectory, "mc", "node.exe");
+        if (File.Exists(mcNode2)) return mcNode2;
 
         // 2. 系统 PATH
         string path = Environment.GetEnvironmentVariable("PATH") ?? "";
