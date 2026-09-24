@@ -253,7 +253,7 @@ dotnet publish -c Release -r win-x64 --self-contained true `
 ### 前置要求
 
 - [Node.js](https://nodejs.org)(v18+)
-- 在 `mc/` 目录下执行 `npm install`(首次安装 mineflayer 依赖)
+- 右键桌宠 → 我的世界 → **安装MC模块** 一键安装(首次需要);也可以在 `mc/` 目录下手动 `npm install`
 
 ### 怎么连接
 
@@ -262,7 +262,6 @@ dotnet publish -c Release -r win-x64 --self-contained true `
 | 选项 | 说明 |
 |------|------|
 | **连接本机(127.0.0.1)** | 你自己的电脑开了 MC 服,直接点这个 |
-| **连接局域网...** | 自动扫描局域网内的 MC 服务器 |
 | **连接 Sakura FRP…** | 别人的服、或者用内网穿透,弹窗填服务器地址和端口,点连接 |
 
 ### 你的服怎么开
@@ -289,7 +288,7 @@ dotnet publish -c Release -r win-x64 --self-contained true `
 
 1. 装了服务器的那台电脑上装 [Sakura FRP](https://www.natfrp.com),建一个 TCP 隧道,本地端口填 25565
 2. 启动隧道,记下分配的域名(如 `xxxxxx.frcp.cn`)
-3. 桌宠右键 → 我的世界 → 局域网/内网穿透 → 地址填域名,端口填 25565 → 连接
+3. 桌宠右键 → 我的世界 → 连接 Sakura FRP → 地址填域名,端口填 25565 → 连接
 
 ### 支持的版本
 
