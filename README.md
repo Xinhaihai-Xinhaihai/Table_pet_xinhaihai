@@ -304,8 +304,8 @@ dotnet publish -c Release -r win-x64 --self-contained true `
 微信 / 支付宝均可扫码:
 
 <p>
-<img src="docs/sponsor.png" alt="微信支付" width="280">
-<img src="docs/sponsor.jpg" alt="支付宝" width="280">
+<img src="XinHaiHai/docs/sponsor.png" alt="微信支付" width="280">
+<img src="XinHaiHai/docs/sponsor.jpg" alt="支付宝" width="280">
 </p>
 
 ## 开源协议
