@@ -70,6 +70,13 @@ public class AppConfig
     public int debugCoins { get; set; } = -1;
     /// <summary>调试用:假设有听歌软件在运行(配合真实声音测试听歌模式)。</summary>
     public bool debugAssumePlayer { get; set; } = false;
+
+    /// <summary>MC 服务器地址。本机开服填 127.0.0.1，Sakura 穿透也填本机。</summary>
+    public string mcHost { get; set; } = "127.0.0.1";
+    /// <summary>MC 端口，默认 25565。</summary>
+    public int mcPort { get; set; } = 25565;
+    /// <summary>node.exe 完整路径;留空则自动查找。</summary>
+    public string nodePath { get; set; } = "";
 }
 
 /// <summary>跨启动保存的桌宠状态。</summary>
