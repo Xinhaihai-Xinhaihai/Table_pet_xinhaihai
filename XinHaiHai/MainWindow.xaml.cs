@@ -31,7 +31,7 @@ public partial class MainWindow : Window
     MenuItem miHead, miPat, miPlay, miChat, miShop, miStatus, miFood, miDrink, miPlan, miReplan, miHide, miDir, miExit;
     MenuItem miLook, miLookOfficial, miLookCustom, miLookGif, miLookLive2d, miRename;
     MenuItem miTalk, miTalkLocal, miTalkLlm, miLlmSetup;
-    MenuItem miMc, miMcLocal, miMcLan, miMcFrp, miMcCloud, miMcChat;
+    MenuItem miMc, miMcLocal, miMcLan, miMcFrp, miMcCloud, miMcChat, miMcInstall;
     readonly McLink mc = new();
     Window planWin, shopWin, pantryWin;
 
@@ -547,6 +547,7 @@ public partial class MainWindow : Window
         miMc = new MenuItem { Header = "我的世界" };
         miMcLocal = Item("连接本机(127.0.0.1)", () => StartMc("127.0.0.1", 25565));
         miMcLan = Item("连接局域网…", ShowLanConnect);
+        miMcInstall = Item("安装MC模块(npm install…)", InstallMcModule);
         miMcFrp = Item("局域网/内网穿透…", () => ShowFrpConnect());
         miMcCloud = Item("连接云服务器…", () => ShowCloudConnect());
         miMcChat = Item("MC中说句话…", ShowMcChatBox);
@@ -556,6 +557,7 @@ public partial class MainWindow : Window
         miMc.Items.Add(miMcCloud);
         miMc.Items.Add(new Separator());
         miMc.Items.Add(miMcChat);
+        miMc.Items.Add(miMcInstall);
         miMcChat = Item("MC中说句话…", ShowMcChatBox);
         miRename = Item("给她改名…", ShowRename);
         miHide = Item("躲进托盘休息", HideToTray);
@@ -1358,7 +1360,7 @@ public partial class MainWindow : Window
         var win = new Window
         {
             Title = "连接局域网",
-            Width = 400, Height = 300,
+            Width = 400, Height = 280,
             WindowStartupLocation = WindowStartupLocation.CenterScreen,
             Background = new SolidColorBrush(Color.FromRgb(0x1a, 0x1a, 0x2e)),
             Foreground = Brushes.White,
@@ -1379,15 +1381,14 @@ public partial class MainWindow : Window
         sp.Children.Add(lb);
 
         var row = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right };
-        var btnManual = new Button { Content = "手动输入", Width = 90, Margin = new Thickness(0, 0, 8, 0), Background = new SolidColorBrush(Color.FromRgb(0xC9, 0xB4, 0xBE)), Foreground = Brushes.White };
+        var btnManual = new Button { Content = "手动输入IP", Width = 100, Margin = new Thickness(0, 0, 8, 0), Background = new SolidColorBrush(Color.FromRgb(0xC9, 0xB4, 0xBE)), Foreground = Brushes.White };
         var btnConn = new Button { Content = "连接", Width = 80, Background = new SolidColorBrush(Color.FromRgb(0xC9, 0xB4, 0xBE)), Foreground = Brushes.White };
         btnConn.Click += (s, e) =>
         {
             if (lb.SelectedItem is string selected)
             {
-                var parts = selected.Split('|');
                 win.Close();
-                StartMc(parts[0].Trim(), int.TryParse(parts[1].Trim(), out int p) ? p : 25565);
+                StartMc(selected.Trim(), 25565);
             }
         };
         btnManual.Click += (s, e) => { win.Close(); ShowCloudConnect(); };
@@ -1456,7 +1457,7 @@ public partial class MainWindow : Window
                                     if (await Task.WhenAny(connectTask, Task.Delay(300)) == connectTask && tcp.Connected)
                                     {
                                         lock (found) found.Add((ip, port));
-                                        Dispatcher.BeginInvoke(() => lb.Items.Add($"{ip} | {port}"));
+                                        Dispatcher.BeginInvoke(() => lb.Items.Add(ip));
                                         tcp.Close();
                                         break;
                                     }
@@ -1533,6 +1534,36 @@ public partial class MainWindow : Window
         win.Content = sp;
         win.Show();
         tbHost.Focus();
+    }
+
+    void InstallMcModule()
+    {
+        if (!System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable())
+        { ShowBubble("需要网络才能安装", 4); return; }
+        ShowBubble("正在安装MC模块,请稍候…", 8);
+        var psi = new ProcessStartInfo("npm", "install")
+        {
+            WorkingDirectory = Path.Combine(AppContext.BaseDirectory, "mc"),
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+        };
+        try
+        {
+            var p = Process.Start(psi);
+            string output = p.StandardOutput.ReadToEnd();
+            string err = p.StandardError.ReadToEnd();
+            p.WaitForExit(60000);
+            if (p.ExitCode == 0)
+                Dispatcher.BeginInvoke(() => ShowBubble("MC模块安装成功!", 5));
+            else
+                Dispatcher.BeginInvoke(() => ShowBubble("安装失败:" + (err.Length > 80 ? err[..80] : err), 8));
+        }
+        catch (Exception ex)
+        {
+            Dispatcher.BeginInvoke(() => ShowBubble("npm没装好,请先装Node.js", 8));
+        }
     }
 
     void ShowFrpConnect()
