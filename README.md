@@ -73,7 +73,7 @@ Table_pet_xinhaihai_v1.6.0\
 | **双对话模式** | 右键 →「对话模式」随时切换:**本地台词**(JSON 随机抽,离线零延迟)/ **大模型对话**(接 OpenAI 兼容接口,按可改人设即时生成);大模型 6 秒没回就静默跳过本次台词,快乐值等其它功能照常 |
 | **自定义名字** | 右键 →「给她改名…」:菜单、托盘、各窗口标题、台词里的名字全部跟着改 |
 | **主动撒娇** | 定时弹气泡求陪伴/讨吃的,越无聊/越饿催得越勤 |
-| **进 MC 聊天** | 右键「我的世界」→ 连接本机/连接 Sakura FRP;游戏里别人说话,大模型判断是聊天就回话、是指令(如「把我tp到xxx」)就自动执行;原版/Fabric/Forge/NeoForge 通用,不装模组 |
+| **进 MC 聊天** | 右键「我的世界」→ 连接本机/连接 Sakura FRP;只能连没有联机 mod 的服务器;游戏里别人说话,大模型判断是聊天就回话、是指令(如「把我tp到xxx」)就自动执行 |
 | **置顶不扰** | 每 2 秒重新置顶(压过别人的强制置顶),永不抢焦点、不进 Alt+Tab |
 | **后台常驻** | 单文件 exe、托盘常驻、单实例 |
 
@@ -248,7 +248,7 @@ dotnet publish -c Release -r win-x64 --self-contained true `
 
 ## 我的世界(Minecraft)联机
 
-桌宠可以进入 MC 服务器聊天、互动、执行指令,原版/Fabric/Forge/NeoForge 全版本通用,不装模组。
+桌宠可以进入没有联机 mod 的 MC 服务器聊天、互动、执行指令。带联机频道的 Forge / Fabric / NeoForge 整合包会拒绝原版客户端,落幕曲这类服连不上。
 
 ### 前置要求
 
@@ -268,7 +268,7 @@ dotnet publish -c Release -r win-x64 --self-contained true `
 
 最简单:桌面上开 MC → 对局域网开放 → 记下端口号(比如 25565) → 桌宠点「连接本机」。
 
-也可以用原版服务端、Forge 服务端、Fabric 服务端等。确保 `server.properties` 里 `online-mode=false`(离线服),桌宠才能连上。
+用原版服务端即可。服里如果装了自定义联机、Forge 网络频道或 Fabric 网络频道,桌宠会被踢。确保 `server.properties` 里 `online-mode=false`(离线服)。
 
 ### 自动拿 OP
 
@@ -292,7 +292,7 @@ dotnet publish -c Release -r win-x64 --self-contained true `
 
 ### 支持的版本
 
-原版 1.8~1.21+ / Fabric / Forge / NeoForge 全部通用。桌宠不装模组,只用登录协议连服。服务器需要 `online-mode=false`。
+只能连 **没有联机 mod** 的服务器,原版 1.8~1.20.1。普通玩法 mod 可以,但 Forge/Fabric/NeoForge 的联机频道会把桌宠当成原版客户端踢掉。服务器需要 `online-mode=false`。1.6.4 这类过旧版本也不支持。
 
 ## 赞助
 
