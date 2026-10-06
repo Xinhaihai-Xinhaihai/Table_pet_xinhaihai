@@ -54,9 +54,8 @@ public static class AudioMeter
         catch { return -1; }
         finally
         {
-            // COM 对象统一释放,避免每次采样都泄漏一个引用计数
+            // o 与 meter 是同一个 COM 对象,只能 release 一次
             if (meter != null) Marshal.ReleaseComObject(meter);
-            if (o != null) Marshal.ReleaseComObject(o);
             if (dev != null) Marshal.ReleaseComObject(dev);
             if (en != null) Marshal.ReleaseComObject(en);
         }

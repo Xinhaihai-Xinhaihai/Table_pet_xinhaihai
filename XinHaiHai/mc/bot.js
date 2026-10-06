@@ -9,6 +9,10 @@
  * 与 C# 端(McLink)约定:
  *   stdout: SPAWN / KICK <原因> / ERR <原因> / EVENT death / MSG <聊天原文>
  *   stdin : 一行一条,以 / 开头=当原版指令执行,否则当聊天发送
+ *
+ * 注意: 1.20.2+ 官方要求 Mojang 登录,离线模式只支持 ≤1.20.1。
+ *       因此不指定 version,让 mineflayer 与服务器握手时自动选兼容版本;
+ *       连上 1.20.2+ 的服会报 auth 错误,属正常,提示用户换离线服。
  */
 const mineflayer = require('mineflayer');
 
@@ -18,42 +22,71 @@ const name = (process.env.MC_NAME || 'XinHaiHai').slice(0, 16) || 'XinHaiHai';
 
 let bot = null;
 let reconnectTimer = null;
+let fatal = false; // 被踢/永久错误:不再重连
 
 function log(prefix, line) {
   console.log(prefix + (line == null ? '' : ' ' + String(line).replace(/\r?\n/g, ' ')));
 }
 
+function cleanup(b) {
+  try { b.removeAllListeners(); } catch (e) {}
+  try { if (b !== bot) b.quit(); } catch (e) {}
+}
+
 function makeBot() {
-  const b = mineflayer.createBot({
-    host,
-    port,
-    username: name,
-    auth: 'offline',      // 走线下模式,只连 online-mode=false 的服务器
-    version: '1.20.1',    // 自动选兼容版本
-  });
+  if (fatal || bot) return;
+  let b;
+  try {
+    b = mineflayer.createBot({
+      host,
+      port,
+      username: name,
+      auth: 'offline', // 离线模式,只连 online-mode=false 的服务器
+    });
+  } catch (e) {
+    log('ERR', e && e.message ? e.message : String(e));
+    return;
+  }
   bot = b;
 
-  b.once('login', () => { /* 二次握手,等 spawn */ });
-  b.once('spawn', () => log('SPAWN'));
+  b.on('spawn', () => log('SPAWN'));
   b.on('messagestr', (msg) => log('MSG', msg));
+  b.on('whisper', (from, msg) => log('MSG', '<' + from + '> ' + msg));
   b.on('death', () => log('EVENT', 'death'));
-  b.once('kicked', (reason) => log('KICK', reason));
-  b.once('error', (err) => log('ERR', err && err.message ? err.message : String(err)));
+
+  // 被踢:告知 C# 端并退出(不重连)
+  b.on('kicked', (reason) => {
+    log('KICK', reason);
+    fatal = true;
+    cleanup(b);
+    bot = null;
+    clearTimeout(reconnectTimer);
+    process.exit(0);
+  });
+
+  // 连接错误:网络类可重连,协议/auth 类退出
+  b.on('error', (err) => {
+    const m = (err && (err.message || String(err))) || '';
+    log('ERR', m);
+    if (/auth|unsupported|invalid|kicked|version/i.test(m)) {
+      fatal = true;
+      cleanup(b);
+      bot = null;
+      clearTimeout(reconnectTimer);
+      process.exit(0);
+    }
+  });
 
   b.on('end', (reason) => {
+    if (bot !== b) return;
     bot = null;
-    if (process.env.MC_SHUTDOWN === '1') return;
-    log('ERR', 'disconnected: ' + (reason || 'unknown'));
-    // 断线自动重连(5 秒),桌宠端看到 ERR 提示
+    cleanup(b);
+    if (process.env.MC_SHUTDOWN === '1' || fatal) return;
+    // 普通断线:5 秒后重连
     clearTimeout(reconnectTimer);
     reconnectTimer = setTimeout(() => { try { makeBot(); } catch (e) { log('ERR', e.message); } }, 5000);
   });
 
-  b.on('whisper', (from, msg) => log('MSG', '<' + from + '> ' + msg));
-
-  // 自己说过的话别回显
-  const myMsg = new Set();
-  b.on('message', (json, position) => { /* 忽略 */ });
   return b;
 }
 
@@ -66,14 +99,18 @@ process.stdin.on('data', (chunk) => {
     const line = pending.slice(0, idx).trim();
     pending = pending.slice(idx + 1);
     if (!line || !bot) continue;
-    if (line.startsWith('/')) {
-      bot.chat(line); // 原版指令(如 /tp 玩家 目的地、/time set day)
-    } else {
-      bot.chat(line);
-    }
+    try { bot.chat(line); } catch (e) { log('ERR', 'send failed: ' + e.message); }
   }
 });
 
-process.on('SIGINT', () => { process.env.MC_SHUTDOWN = '1'; try { if (bot) bot.quit(); } catch (e) {} process.exit(0); });
+function shutdown() {
+  process.env.MC_SHUTDOWN = '1';
+  fatal = true;
+  clearTimeout(reconnectTimer);
+  try { if (bot) bot.quit(); } catch (e) {}
+  process.exit(0);
+}
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);
 
 makeBot();

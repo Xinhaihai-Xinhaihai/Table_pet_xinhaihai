@@ -292,7 +292,7 @@ dotnet publish -c Release -r win-x64 --self-contained true `
 
 ### 支持的版本
 
-只能连 **没有联机 mod** 的服务器,原版 1.8~1.20.1。普通玩法 mod 可以,但 Forge/Fabric/NeoForge 的联机频道会把桌宠当成原版客户端踢掉。服务器需要 `online-mode=false`。1.6.4 这类过旧版本也不支持。
+只能连 **没有联机 mod** 的服务器。机器人用离线模式登录,所以 1.20.2 及以上(强制 Mojang 认证)连不上,请用 ≤1.20.1 的服;版本由 mineflayer 与服务器握手时自动选择,不需要手动指定。普通玩法 mod 可以,但 Forge/Fabric/NeoForge 的联机频道会把桌宠当成原版客户端踢掉。服务器需要 `online-mode=false`。1.6.4 这类过旧版本也不支持。
 
 ## 赞助
 
