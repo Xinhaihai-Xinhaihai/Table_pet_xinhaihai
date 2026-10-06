@@ -253,7 +253,7 @@ dotnet publish -c Release -r win-x64 --self-contained true `
 ### 前置要求
 
 - [Node.js](https://nodejs.org)(v18+)
-- 在 `mc/` 目录下执行 `npm install`(首次安装 mineflayer 依赖)
+- 在 `mc/` 目录下执行 `npm install`(首次安装 mineflayer 依赖)。`mc/bot.js` 模板已随仓库内置,右键 → 我的世界 →「安装MC模块」会自动在后台跑 npm install(不卡界面)
 
 ### 怎么连接
 

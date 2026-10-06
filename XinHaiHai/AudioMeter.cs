@@ -37,18 +37,28 @@ public static class AudioMeter
     public static float Peak()
     {
         IMMDeviceEnumerator en = null;
+        IMMDevice dev = null;
+        IAudioMeterInformation meter = null;
+        object o = null;
         try
         {
             en = (IMMDeviceEnumerator)(new MMDeviceEnumerator());
-            if (en.GetDefaultAudioEndpoint(0 /*eRender*/, 0 /*eConsole*/, out var dev) != 0 || dev == null)
+            if (en.GetDefaultAudioEndpoint(0 /*eRender*/, 0 /*eConsole*/, out dev) != 0 || dev == null)
                 return -1;
             var iid = IID_IAudioMeterInformation;
-            if (dev.Activate(ref iid, 1 /*CLSCTX_INPROC_SERVER*/, IntPtr.Zero, out object o) != 0 || o == null)
+            if (dev.Activate(ref iid, 1 /*CLSCTX_INPROC_SERVER*/, IntPtr.Zero, out o) != 0 || o == null)
                 return -1;
-            var meter = (IAudioMeterInformation)o;
+            meter = (IAudioMeterInformation)o;
             return meter.GetPeakValue(out float peak) == 0 ? peak : -1;
         }
         catch { return -1; }
-        finally { if (en != null) Marshal.ReleaseComObject(en); }
+        finally
+        {
+            // COM 对象统一释放,避免每次采样都泄漏一个引用计数
+            if (meter != null) Marshal.ReleaseComObject(meter);
+            if (o != null) Marshal.ReleaseComObject(o);
+            if (dev != null) Marshal.ReleaseComObject(dev);
+            if (en != null) Marshal.ReleaseComObject(en);
+        }
     }
 }

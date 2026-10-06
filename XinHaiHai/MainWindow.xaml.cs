@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
 using System.IO;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -1631,29 +1633,64 @@ public partial class MainWindow : Window
         if (!System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable())
         { ShowBubble("需要网络才能安装", 4); return; }
         ShowBubble("正在安装MC模块,请稍候…", 8);
-        var psi = new ProcessStartInfo("npm", "install")
+        string mcDir = Path.Combine(AppContext.BaseDirectory, "mc");
+        // 后台线程跑 npm install,避免 UI 线程同步等待导致卡死
+        Task.Run(async () =>
         {
-            WorkingDirectory = Path.Combine(AppContext.BaseDirectory, "mc"),
-            UseShellExecute = false,
-            CreateNoWindow = true,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-        };
-        try
-        {
-            var p = Process.Start(psi);
-            string output = p.StandardOutput.ReadToEnd();
-            string err = p.StandardError.ReadToEnd();
-            p.WaitForExit(60000);
-            if (p.ExitCode == 0)
-                Dispatcher.BeginInvoke(() => ShowBubble("MC模块安装成功!", 5));
-            else
-                Dispatcher.BeginInvoke(() => ShowBubble("安装失败:" + (err.Length > 80 ? err[..80] : err), 8));
-        }
-        catch (Exception ex)
-        {
-            Dispatcher.BeginInvoke(() => ShowBubble("npm没装好,请先装Node.js", 8));
-        }
+            string output = "", err = "";
+            int exitCode = -1;
+            bool started = false;
+            try
+            {
+                if (!Directory.Exists(mcDir))
+                {
+                    err = "mc 目录不存在(发布包缺失 mc/bot.js 模板)";
+                }
+                else
+                {
+                    var psi = new ProcessStartInfo("npm", "install --no-audit --no-fund")
+                    {
+                        WorkingDirectory = mcDir,
+                        UseShellExecute = false,
+                        CreateNoWindow = true,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        StandardOutputEncoding = Encoding.UTF8,
+                        StandardErrorEncoding = Encoding.UTF8,
+                    };
+                    var p = Process.Start(psi);
+                    started = true;
+                    var oTask = Task.Run(() => p.StandardOutput.ReadToEnd());
+                    var eTask = Task.Run(() => p.StandardError.ReadToEnd());
+                    bool exited = await Task.Run(() => p.WaitForExit(180000));
+                    output = await oTask;
+                    err = await eTask;
+                    if (!exited)
+                    {
+                        try { p.Kill(true); } catch { }
+                        err = "安装超时(3分钟)";
+                    }
+                    else
+                    {
+                        exitCode = p.ExitCode;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                err = ex.Message;
+                if (!started)
+                {
+                    Dispatcher.BeginInvoke(() => ShowBubble("npm没装好,请先装Node.js", 8));
+                    return;
+                }
+            }
+            Dispatcher.BeginInvoke(() =>
+            {
+                if (started && exitCode == 0) ShowBubble("MC模块安装成功!", 5);
+                else ShowBubble("安装失败:" + (err.Length > 80 ? err[..80] : err), 8);
+            });
+        });
     }
 
     void ShowFrpConnect()

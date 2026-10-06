@@ -1,6 +1,7 @@
 # build
 XinHaiHai/bin/
 XinHaiHai/obj/
+XinHaiHai/publish/
 bin/
 obj/
 .vs/

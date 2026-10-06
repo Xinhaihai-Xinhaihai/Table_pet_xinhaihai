@@ -100,6 +100,67 @@ public static class LlmClient
         }
     }
 
+    /// <summary>
+    /// 自由提问:不带固定台词约束,适合 MC 游戏里判断指令/聊天等场景。
+    /// prompt 为完整指令(可含人设要求),返回模型原始输出;超时或失败返回 null。
+    /// </summary>
+    public static async Task<string> AskAsync(string prompt)
+    {
+        if (!Enabled) return null;
+
+        var cfg = Store.Config;
+        int timeoutMs = Math.Max(1, cfg.llmTimeoutSeconds) * 1000;
+        using var cts = new CancellationTokenSource(timeoutMs);
+
+        try
+        {
+            string url = cfg.llmBaseUrl.TrimEnd('/') + "/chat/completions";
+
+            string persona = string.IsNullOrWhiteSpace(cfg.llmPersona)
+                ? "你是一只桌面宠物,性格活泼可爱,称呼使用者为“主人”。"
+                : cfg.llmPersona.Replace("{name}", cfg.petName);
+
+            var payload = new
+            {
+                model = cfg.llmModel,
+                messages = new object[]
+                {
+                    new { role = "system", content = persona },
+                    new { role = "user", content = prompt }
+                },
+                temperature = 0.2,
+                max_tokens = 200,
+                stream = false
+            };
+
+            using var req = new HttpRequestMessage(HttpMethod.Post, url)
+            {
+                Content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json")
+            };
+            req.Headers.TryAddWithoutValidation("Authorization", "Bearer " + cfg.llmApiKey);
+
+            using var resp = await Http.SendAsync(req, HttpCompletionOption.ResponseContentRead, cts.Token);
+            string body = await resp.Content.ReadAsStringAsync(cts.Token);
+            if (!resp.IsSuccessStatusCode)
+            {
+                Store.Log($"大模型接口返回 {(int)resp.StatusCode}:{Trim(body)}");
+                return null;
+            }
+
+            return ExtractContent(body);
+        }
+        catch (OperationCanceledException)
+        {
+            Store.Log($"大模型对话超时({cfg.llmTimeoutSeconds}s),已取消本次提问");
+            return null;
+        }
+        catch (Exception ex)
+        {
+            Store.Log("大模型对话失败:" + ex.Message);
+            return null;
+        }
+    }
+
     /// <summary>从 OpenAI 兼容响应里取 choices[0].message.content。</summary>
     static string ExtractContent(string json)
     {
