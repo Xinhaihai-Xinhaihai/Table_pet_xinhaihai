@@ -9,6 +9,9 @@ obj/
 *.suo
 *.cache
 
+# local packaging
+staging/
+
 # local/runtime
 **/log.txt
 **/state.json
