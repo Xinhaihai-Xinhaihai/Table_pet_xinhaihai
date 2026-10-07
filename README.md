@@ -237,6 +237,8 @@ dotnet publish -c Release -r win-x64 --self-contained true `
 | 文件 | 作用 |
 |------|------|
 | `MainWindow.xaml(.cs)` | 形象/血条/气泡;主循环、互动、走动、商店、食堂、状态窗、托盘、外观四模式、Live2D宿主、GIF播放、改名 |
+| `McPanel.cs` | MC 联机面板(连接/局域网扫描/npm 安装/node 路径/游戏名/聊天代答),从 MainWindow 拆出 |
+| `AppVersion.cs` | 版本号常量,与 csproj 的 `<Version>` 保持一致(CI 校验) |
 | `GifPlayer.cs` | GIF 逐帧解码、黑底抠透明 |
 | `PetState.cs` | 快乐值(0~1000)/饥饿/口渴/独处计时/听歌模式/礼物加护 |
 | `DailyPlanner.cs` | 0 点规划:任务库随机挑选、随机时段、工作强度→工资、溜达时段 |
@@ -245,6 +247,9 @@ dotnet publish -c Release -r win-x64 --self-contained true `
 | `MouseMischief.cs` / `MusicLauncher.cs` / `AudioMeter.cs` | 抢鼠标 / 探测并启动播放器 / 系统音量峰值检测(听歌模式) |
 | `McLink.cs` | 桌宠进 MC:进程管理、收发消息 |
 | `Dialogue.cs` / `Native.cs` / `Config.cs` | 台词 / Win32(置顶·鼠标·媒体键) / 配置持久化 |
+| `LlmClient.cs` | 大模型对话客户端(OpenAI 兼容接口,6 秒超时降级) |
+
+> 构建验证:push 到 main 会自动跑 GitHub Actions(`.github/workflows/build.yml`)——版本一致性检查 + 编译 + 单文件 publish,以后不会再出现"仓库编译不过"的情况。
 
 ## 我的世界(Minecraft)联机
 

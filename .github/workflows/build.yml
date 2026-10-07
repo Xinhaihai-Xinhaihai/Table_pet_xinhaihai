@@ -1,0 +1,57 @@
+name: build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Check version consistency
+        shell: pwsh
+        run: |
+          $csproj = Get-Content "XinHaiHai/心海海.csproj" -Raw
+          if ($csproj -match '<Version>([^<]+)</Version>') { $v = $Matches[1] } else { throw "csproj has no <Version>" }
+          $cs = Get-Content "XinHaiHai/AppVersion.cs" -Raw
+          if ($cs -match 'Version = "([^"]+)"') { $v2 = $Matches[1] } else { throw "AppVersion.cs has no Version" }
+          Write-Host "csproj=$v  AppVersion.cs=$v2"
+          if ($v -ne $v2) { throw "version mismatch: csproj=$v vs AppVersion.cs=$v2" }
+
+      - name: Restore
+        run: dotnet restore XinHaiHai/心海海.csproj
+
+      - name: Build
+        run: dotnet build XinHaiHai/心海海.csproj -c Release --no-restore
+
+      - name: Publish single-file exe
+        run: >
+          dotnet publish XinHaiHai/心海海.csproj
+          -c Release -r win-x64 --self-contained true
+          -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
+          -o publish
+
+      - name: Check exe
+        shell: pwsh
+        run: |
+          $exe = "publish/心海海.exe"
+          if (-not (Test-Path $exe)) { throw "exe not found: $exe" }
+          $sz = (Get-Item $exe).Length
+          Write-Host "built: $exe ($([math]::Round($sz/1MB,1)) MB)"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: xinhaihai-publish
+          path: publish/

@@ -15,6 +15,8 @@
     <Product>心海海</Product>
     <Company>心海海</Company>
     <Copyright>心海海桌宠</Copyright>
+    <!-- 版本号唯一来源。运行时 AppVersion.cs 必须与这里一致(CI 会校验),
+         发版流程: 改这里 + AppVersion.cs + README → commit → tag v{版本号} -->
     <Version>1.7.5</Version>
     <SatelliteResourceLanguages>zh-Hans</SatelliteResourceLanguages>
   </PropertyGroup>
