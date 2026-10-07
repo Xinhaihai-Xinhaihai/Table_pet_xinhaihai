@@ -7,7 +7,7 @@ namespace XinHaiHai;
 /// </summary>
 public static class AppVersion
 {
-    public const string Version = "1.7.5";
+    public const string Version = "1.7.6";
     public const string Tag = "v" + Version;
     public static string Url => "https://github.com/Xinhaihai-Xinhaihai/Table_pet_xinhaihai/releases/tag/" + Tag;
 }
